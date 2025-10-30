@@ -1,14 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="DriverAdapters\" />
-    <Folder Include="DrivenAdapters\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="DrivenAdapters\Ingrediente\" />
+		<Folder Include="DrivenAdapters\Negocio\" />
+		<Folder Include="DrivenAdapters\Perfil\" />
+		<Folder Include="DrivenAdapters\Producto\" />
+		<Folder Include="DrivenAdapters\Rol\" />
+		<Folder Include="DriverAdapters\Rol\" />
+		<Folder Include="DriverAdapters\Ingrediente\" />
+		<Folder Include="DriverAdapters\Producto\" />
+		<Folder Include="DriverAdapters\Perfil\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
 </Project>

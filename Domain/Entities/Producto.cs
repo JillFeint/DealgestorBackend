@@ -9,6 +9,7 @@ namespace Domain.Entities
     public class Producto
     {
         public Guid Id { get; set; }
+        public int Referencia { get; set; }
         public string Nombre { get; set; }
         public string Imagen { get; set; }
         public string Categoria { get; set; }
