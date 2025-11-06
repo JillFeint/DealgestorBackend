@@ -11,32 +11,29 @@ namespace Application.Services.Rol
     // Este es el Caso de Uso o Service Layer
     public class RolCrearPost : PortDriverRolCrear
     {
-        // 💡 Inyección: Inyectamos el puerto de salida (Driven Port)
-        private readonly IDrivenRolRepository _rolPersistencePort;
+        private readonly PortDrivenRolCrear _rolPersistencePort;
 
-        public RolCrearPost(IDrivenRolRepository rolPersistencePort)
+        public RolCrearPost(PortDrivenRolCrear rolPersistencePort)
         {
             _rolPersistencePort = rolPersistencePort;
         }
 
-        // --- Implementación de IDriverRolPort.CrearNuevoRol ---
         public async Task<RolDTODriver> CrearNuevoRol(RolDTODriver nuevoRolDTO)
         {
-            // 1. Validaciones de Negocio (Core Logic)
-            // Se verifica si el Rol ya existe por su 'Tipo' o 'Nombre'
-            bool rolExiste = await _rolPersistencePort.ExisteRolPorTipo(nuevoRolDTO.Tipo);
+            bool rolExiste = await _rolPersistencePort.ExisteRolPorTipo(nuevoRolDTO.Nombre);
             if (rolExiste)
             {
-                // Devolvemos una excepción de negocio que el Adapter manejará como 400
                 throw new ArgumentException($"El Rol con tipo '{nuevoRolDTO.Tipo}' ya existe en el sistema.");
             }
 
             // 2. Mapeo a la Entidad de Dominio (Input DTO -> Domain Entity)
             // Aquí es donde el DTO se convierte en un objeto que la capa de Dominio entiende.
-            var nuevoRol = new RolDTODriven(
-                identificacion: nuevoRolDTO.Identificacion == Guid.Empty ? Guid.NewGuid() : nuevoRolDTO.Identificacion,
-                tipo: nuevoRolDTO.Tipo,
-                nombre: nuevoRolDTO.Nombre
+
+
+            var nuevoRol = new Domain.Entities.Rol(
+                Identificacion: nuevoRolDTO.Identificacion == Guid.Empty ? Guid.NewGuid() : nuevoRolDTO.Identificacion,
+                Tipo: nuevoRolDTO.Tipo,
+                Nombre: nuevoRolDTO.Nombre
             );
 
             // 3. Invocación al Puerto de Salida (Driven Port)

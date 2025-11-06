@@ -11,5 +11,12 @@ namespace Domain.Entities
         public Guid Identificacion { get; set; }
         public string Tipo { get; set; }
         public string Nombre { get; set; }
+
+        public Rol(Guid Identificacion, string Tipo, string Nombre)
+        {
+            this.Identificacion = Identificacion;
+            this.Tipo = Tipo;
+            this.Nombre = Nombre;
+        }
     }
 }
