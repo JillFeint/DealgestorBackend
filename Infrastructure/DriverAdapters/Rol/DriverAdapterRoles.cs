@@ -9,20 +9,23 @@ namespace Infrastructure.DriverAdapters.Rol
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController : ControllerBase
+    public class DriverAdapterRoles : ControllerBase
     {
         // 💡 Inyección: Inyectamos el puerto de entrada (IDriverPerfilPort).
-        private readonly IDriverRolPort _rolPort;
+        private readonly PortDriverRolConsultar _rolPort;
         private readonly PortDriverRolCrear _rolPortCrear;
-        
+        private readonly PortDriverRolEliminar _rolPortEliminar;
+        private readonly PortDriverRolModificar _rolPortModificar;
 
-        public RolController(IDriverRolPort IDriverRolPort, PortDriverRolCrear rolPortCrear)
+        public DriverAdapterRoles(PortDriverRolConsultar DriverRolPort, PortDriverRolCrear rolPortCrear, PortDriverRolEliminar rolPortEliminar, PortDriverRolModificar rolPortModificar)
         {
-            _rolPort = IDriverRolPort;
+            _rolPort = DriverRolPort;
             _rolPortCrear = rolPortCrear;
+            _rolPortEliminar = rolPortEliminar;
+            _rolPortModificar = rolPortModificar;
         }
 
-        [HttpGet]
+        [HttpGet("consultar")]
         public async Task<IActionResult> ConsultarRolesExistentes([FromQuery] string nombre)
         {
             if (string.IsNullOrWhiteSpace(nombre))
@@ -32,8 +35,7 @@ namespace Infrastructure.DriverAdapters.Rol
 
             try
             {
-                // 💡 Llamada al Puerto de Entrada: El Driver Adapter llama al puerto.
-                List<RolDTODriven> rolesExistente = await _rolPort.ConsultarIdentificadoresRol(nombre);
+                RolDTODriver rolesExistente = await _rolPort.ConsultarIdentificadoresRol(nombre);
 
                 // 💡 Código Limpio: Retornamos la respuesta HTTP 200 OK con el resultado.
                 return Ok(rolesExistente);
@@ -60,20 +62,76 @@ namespace Infrastructure.DriverAdapters.Rol
 
             try
             {
-                RolDTODriver CrearRol= await _rolPortCrear.CrearNuevoRol(rolCreacionDTO);
+                RolDTODriver CrearRol = await _rolPortCrear.CrearNuevoRol(rolCreacionDTO);
 
                 return Created($"/api/rolcreado/{CrearRol.Identificacion}", CrearRol);
             }
             catch (ArgumentException ex)
             {
-                // Manejo de errores de negocio (Ej: Rol ya existe) - 400 Bad Request
                 return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Manejo de errores genéricos (Ej: Base de datos no disponible) - 500 Internal Server Error
-                // Es crucial loguear el error aquí.
                 return StatusCode(500, new { Message = "Ocurrió un error interno al crear el Rol.", Details = ex.Message });
+            }
+        }
+
+        [HttpDelete("{nombre}")]
+        public async Task<IActionResult> EliminarRol([FromRoute] string nombre)
+        {
+            if (string.IsNullOrEmpty(nombre))
+            {
+                return BadRequest(new { Message = "El Identificador del Rol es un campo obligatorio." });
+            }
+            try
+            {
+                bool rolEliminado = await _rolPortEliminar.EliminarRol(nombre);
+
+                if (rolEliminado)
+                {
+
+                    return Ok(new { Message = "Ha sido eliminado exitosamente." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Sin proceso" });
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Ocurrió un error interno al eliminar.", Details = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ModificarRol([FromBody] RolDTODriver rolModificarDTO)
+        {
+            if (rolModificarDTO == null)
+            {
+                return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
+            }
+
+            if (string.IsNullOrWhiteSpace(rolModificarDTO.Tipo) || string.IsNullOrWhiteSpace(rolModificarDTO.Nombre))
+            {
+                return BadRequest(new { Message = "El Tipo y el Nombre del Rol son campos obligatorios para la modificación." });
+            }
+
+            try
+            {
+                RolDTODriver rolModificado = await _rolPortModificar.ModificarRol(rolModificarDTO);
+                return Ok(rolModificado);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Ocurrió un error interno al modificar el Rol.", Details = ex.Message });
             }
         }
     }

@@ -4,8 +4,10 @@ using Application.Ports.DriverPorts.Perfil;
 using Application.Ports.DriverPorts.Rol;
 using Application.UseCases.Negocio;
 using Application.UseCases.Rol;
+using Infrastructure.Data;
 using Infrastructure.DrivenAdapters.Negocio;
 using Infrastructure.DrivenAdapters.Rol;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -20,10 +22,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// Add your services here
+// Add your services here   
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IDrivenRolRepository, DrivenAdapterRoles>();
-builder.Services.AddScoped<IDriverRolPort, ConsultarRolUseCase>();
+builder.Services.AddScoped<PortDriverRolConsultar, ConsultarRolUseCase>();
+builder.Services.AddScoped<PortDrivenRolConsultar, DrivenAdapterRolConsultar>();
 builder.Services.AddScoped<IDrivenNegocioRepository, DrivenAdapterNegocio>();
 builder.Services.AddScoped<IDriverPerfilPort, ConsultarNegociosDisponiblesUseCase>();
 

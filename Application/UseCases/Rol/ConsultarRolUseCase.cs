@@ -1,32 +1,35 @@
 ﻿using Application.DTOs.Roles;
 using Application.Ports.DrivenPorts.Rol;
 using Application.Ports.DriverPorts.Rol;
-
+using System;
+using System.Threading.Tasks;
 
 namespace Application.UseCases.Rol
 {
-    public class ConsultarRolUseCase : IDriverRolPort
+    public class ConsultarRolUseCase : PortDriverRolConsultar
     {
-        private readonly IDrivenRolRepository _rolRepository;
+        private readonly PortDrivenRolConsultar _rolDrivenConsultar;
 
-        public ConsultarRolUseCase(IDrivenRolRepository rolRepository)
+        public ConsultarRolUseCase(PortDrivenRolConsultar rolDrivenConsultar)
         {
-            _rolRepository = rolRepository;
+            _rolDrivenConsultar = rolDrivenConsultar;
         }
 
-        public async Task<List<RolDTODriven>> ConsultarIdentificadoresRol(string nombre)
+        public async Task<RolDTODriver> ConsultarIdentificadoresRol(string nombre)
         {
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre no puede estar vacío.", nameof(nombre));
 
-            var rolDominio = await _rolRepository.ConsultarRolAsync(nombre);
+            RolDTODriver rolDominio = await _rolDrivenConsultar.ConsultarRolAsync(nombre);
 
-            return rolDominio.Select(entidadDominio => new RolDTODriven
-            {               
-                tblIdentificacion = entidadDominio.Identificacion,
-                tblTipo = entidadDominio.Tipo,
-                tblNombre = entidadDominio.Nombre,
-            }).ToList();
+            if (rolDominio == null)
+            {
+                throw new ArgumentException("No se encontró ningún rol con el nombre especificado.", nameof(nombre));
+            }
+
+            return rolDominio;
+
+
         }
     }
 }

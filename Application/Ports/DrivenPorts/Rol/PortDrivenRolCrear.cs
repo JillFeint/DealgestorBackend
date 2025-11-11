@@ -9,7 +9,7 @@ namespace Application.Ports.DrivenPorts.Rol
 {
     public interface PortDrivenRolCrear
     {
-        Task<bool> ExisteRolPorTipo(string nombre);
-        Task<RolDTODriven> GuardarRol(RolDTODriven rol);
+        Task<bool> ExisteRolPorNombre(string nombre);
+        Task<RolDTODriven> CrearRol(RolDTODriven rol);
     }
 }
