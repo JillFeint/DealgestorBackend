@@ -20,14 +20,18 @@ namespace Application.UseCases.Rol
             if (string.IsNullOrWhiteSpace(nombre))
                 throw new ArgumentException("El nombre no puede estar vacío.", nameof(nombre));
 
-            RolDTODriver rolDominio = await _rolDrivenConsultar.ConsultarRolAsync(nombre);
+            Rol rolDominio = await _rolDrivenConsultar.ConsultarRolAsync(nombre);
 
             if (rolDominio == null)
             {
                 throw new ArgumentException("No se encontró ningún rol con el nombre especificado.", nameof(nombre));
             }
 
-            return rolDominio;
+            return new RolDTODriver {
+                 Identificacion = rolDominio.Identificacion,
+                 Tipo = rolDominio.Tipo,
+                 Nombre = rolDominio.Nombre 
+            };
 
 
         }

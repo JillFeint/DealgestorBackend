@@ -18,23 +18,23 @@ namespace Infrastructure.DrivenAdapters.Rol
             _dbContext = dbContext;
         }
 
-        public async Task<RolDTODriver> ConsultarRolAsync(string nombre)
+        public async Task<Domain.Entities.Rol> ConsultarRolAsync(string nombre)
         {
-            var rol = await _dbContext.Roles
+            var tblRol = await _dbContext.tblRoles
                 .Where(r => r.Nombre.ToLower().Contains(nombre.ToLower()))
                 .FirstOrDefaultAsync();
 
-            if (rol == null)
+            if (tblRol == null)
             {
                 return null;
             }
 
-            return new RolDTODriver
-            {
-                Identificacion = rol.tblIdentificacion,
-                Tipo = rol.tblTipo,
-                Nombre = rol.tblNombre
-            };
+            return new Domain.Entities.Rol
+            (
+                Identificacion =  tblRol.tblIdentificacion,
+                Tipo = tblRol.tblTipo,
+                Nombre = tblRol.tblNombre
+            );
         }
     }
 }

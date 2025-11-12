@@ -18,28 +18,15 @@
 ﻿
 ﻿        public async Task<RolDTODriver> CrearNuevoRol(RolDTODriver nuevoRolDTO)
 ﻿        {
-﻿            bool rolExiste = await _rolPersistencePort.ExisteRolPorNombre(nuevoRolDTO.Nombre);
+﻿            bool rolExiste = await _rolPersistencePort.ExisteRolPorNombre(nuevoRolDTO.Nombre, nuevoRolDTO.Tipo);
 ﻿            if (rolExiste)
 ﻿            {
 ﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoRolDTO.Nombre}' ya existe en el sistema.");
 ﻿            }
+
+﻿            RolDTODriver rolPersistido = await _rolPersistencePort.CrearRol(rolDTODriver);
 ﻿
-﻿            var nuevoRol = new Domain.Entities.Rol(
-﻿                Identificacion: nuevoRolDTO.Identificacion == Guid.Empty ? Guid.NewGuid() : nuevoRolDTO.Identificacion,
-﻿                Tipo: nuevoRolDTO.Tipo,
-﻿                Nombre: nuevoRolDTO.Nombre
-﻿            );
-﻿
-﻿            var rolDTODriven = new RolDTODriven
-﻿            {
-﻿                tblIdentificacion = nuevoRol.Identificacion,
-﻿                tblTipo = nuevoRol.Tipo,
-﻿                tblNombre = nuevoRol.Nombre
-﻿            };
-﻿
-﻿            RolDTODriven rolPersistido = await _rolPersistencePort.CrearRol(rolDTODriven);
-﻿
-﻿            var rolCreadoDTO = new RolDTODriver
+﻿            var rolCreadoDTO = new RolDTODriven
 ﻿            {
 ﻿                Identificacion = rolPersistido.tblIdentificacion,
 ﻿                Tipo = rolPersistido.tblTipo,

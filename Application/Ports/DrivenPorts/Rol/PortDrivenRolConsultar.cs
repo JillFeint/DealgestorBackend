@@ -6,6 +6,6 @@ namespace Application.Ports.DrivenPorts.Rol
 {
     public interface PortDrivenRolConsultar
     {
-        Task<RolDTODriver> ConsultarRolAsync(string nombre);
+        Task<Domain.Entities.Rol> ConsultarRolAsync(string nombre);
     }
 }

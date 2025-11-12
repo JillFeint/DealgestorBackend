@@ -16,13 +16,15 @@ namespace Infrastructure.DrivenAdapters.Rol
             _dbContext = dbContext;
         }
 
-        public async Task<bool> ExisteRolPorNombre(string nombre)
+        public async Task<bool> ExisteRolPorNombre(string nombre, string tipo)
         {
-            // Comprueba si ya existe un rol con el mismo nombre, ignorando mayúsculas/minúsculas.
-            return await _dbContext.Roles.AnyAsync(r => r.Nombre.ToLower() == nombre.ToLower());
+            // Comprueba si ya existe un rol con el mismo nombre y tipo, ignorando mayúsculas/minúsculas.
+            return await _dbContext.Roles.AnyAsync(r => 
+                r.Nombre.ToLower() == nombre.ToLower() && 
+                r.Tipo.ToLower() == tipo.ToLower());
         }
 
-        public async Task<RolDTODriven> CrearRol(RolDTODriven rol)
+        public async Task<RolDTODriven> CrearRol(RolDTODriver rol)
         {
             var nuevoRol = new Domain.Entities.Rol(
                 Identificacion: rol.tblIdentificacion,
