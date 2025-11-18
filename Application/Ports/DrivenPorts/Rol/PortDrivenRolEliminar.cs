@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Ports.DrivenPorts.Rol
 {
-    public interface PortDrivenRolEliminar
+    public interface PortDrivenIngredienteEliminar
     {
         Task<bool> EliminarRol(string nombre);
     }

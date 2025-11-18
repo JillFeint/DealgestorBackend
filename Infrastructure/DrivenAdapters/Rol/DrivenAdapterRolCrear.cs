@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterRolCrear : PortDrivenRolCrear
+    public class DrivenAdapterRolCrear : PortDrivenIngredienteCrear
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -18,29 +18,30 @@ namespace Infrastructure.DrivenAdapters.Rol
 
         public async Task<bool> ExisteRolPorNombre(string nombre, string tipo)
         {
-            // Comprueba si ya existe un rol con el mismo nombre y tipo, ignorando mayúsculas/minúsculas.
-            return await _dbContext.Roles.AnyAsync(r => 
-                r.Nombre.ToLower() == nombre.ToLower() && 
-                r.Tipo.ToLower() == tipo.ToLower());
+            return await _dbContext.tblRoles.AnyAsync(r => 
+                r.tblNombre.ToLower() == nombre.ToLower() && 
+                r.tblTipo.ToLower() == tipo.ToLower());
         }
 
-        public async Task<RolDTODriven> CrearRol(RolDTODriver rol)
+        public async Task<Domain.Entities.Rol> CrearRol(RolDTODriver rol)
         {
-            var nuevoRol = new Domain.Entities.Rol(
-                Identificacion: rol.tblIdentificacion,
-                Tipo: rol.tblTipo,
-                Nombre: rol.tblNombre
+            rol.Identidad = Guid.NewGuid();
+
+            var nuevoRol = new RolDTODriven(
+                tblIdentificacion: rol.Identidad,
+                tblTipo: rol.Tipe,
+                tblNombre: rol.Name
             );
 
-            _dbContext.Roles.Add(nuevoRol);
+            _dbContext.tblRoles.Add(nuevoRol);
             await _dbContext.SaveChangesAsync();
 
             // Devuelve el DTO con los datos del rol recién creado.
-            return new RolDTODriven
+            return new Domain.Entities.Rol
             {
-                tblIdentificacion = nuevoRol.Identificacion,
-                tblTipo = nuevoRol.Tipo,
-                tblNombre = nuevoRol.Nombre
+                Identificacion = nuevoRol.tblIdentificacion,
+                Tipo = nuevoRol.tblTipo,
+                Nombre = nuevoRol.tblNombre
             };
         }
     }

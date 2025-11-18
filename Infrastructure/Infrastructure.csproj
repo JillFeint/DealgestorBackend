@@ -7,12 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="DrivenAdapters\Ingrediente\" />
 		<Folder Include="DrivenAdapters\Negocio\" />
 		<Folder Include="DrivenAdapters\Perfil\" />
 		<Folder Include="DrivenAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Negocio\" />
-		<Folder Include="DriverAdapters\Ingrediente\" />
 		<Folder Include="DriverAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Perfil\" />
 	</ItemGroup>

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterRolEliminar : PortDrivenRolEliminar
+    public class DrivenAdapterRolEliminar : PortDrivenIngredienteEliminar
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -16,14 +16,14 @@ namespace Infrastructure.DrivenAdapters.Rol
 
         public async Task<bool> EliminarRol(string nombre)
         {
-            var rol = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Nombre == nombre);
+            var rol = await _dbContext.tblRoles.FirstOrDefaultAsync(r => r.tblNombre == nombre);
 
             if (rol == null)
             {
                 return false;
             }
 
-            _dbContext.Roles.Remove(rol);
+            _dbContext.tblRoles.Remove(rol);
             var result = await _dbContext.SaveChangesAsync();
             return result > 0;
         }

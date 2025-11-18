@@ -12,6 +12,8 @@ namespace Domain.Entities
         public string Tipo { get; set; }
         public string Nombre { get; set; }
 
+        public Rol() { }   
+        
         public Rol(Guid Identificacion, string Tipo, string Nombre)
         {
             this.Identificacion = Identificacion;

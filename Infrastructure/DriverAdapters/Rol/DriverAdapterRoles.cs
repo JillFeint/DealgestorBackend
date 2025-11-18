@@ -11,13 +11,12 @@ namespace Infrastructure.DriverAdapters.Rol
     [Route("api/[controller]")]
     public class DriverAdapterRoles : ControllerBase
     {
-        // 💡 Inyección: Inyectamos el puerto de entrada (IDriverPerfilPort).
         private readonly PortDriverRolConsultar _rolPort;
-        private readonly PortDriverRolCrear _rolPortCrear;
-        private readonly PortDriverRolEliminar _rolPortEliminar;
-        private readonly PortDriverRolModificar _rolPortModificar;
+        private readonly PortDriverIngredienteCrear _rolPortCrear;
+        private readonly PortDriverIngredienteEliminar _rolPortEliminar;
+        private readonly PortDriverIngredienteModificar _rolPortModificar;
 
-        public DriverAdapterRoles(PortDriverRolConsultar DriverRolPort, PortDriverRolCrear rolPortCrear, PortDriverRolEliminar rolPortEliminar, PortDriverRolModificar rolPortModificar)
+        public DriverAdapterRoles(PortDriverRolConsultar DriverRolPort, PortDriverIngredienteCrear rolPortCrear, PortDriverIngredienteEliminar rolPortEliminar, PortDriverIngredienteModificar rolPortModificar)
         {
             _rolPort = DriverRolPort;
             _rolPortCrear = rolPortCrear;
@@ -37,7 +36,6 @@ namespace Infrastructure.DriverAdapters.Rol
             {
                 RolDTODriver rolesExistente = await _rolPort.ConsultarIdentificadoresRol(nombre);
 
-                // 💡 Código Limpio: Retornamos la respuesta HTTP 200 OK con el resultado.
                 return Ok(rolesExistente);
             }
             catch (Exception ex)
@@ -55,7 +53,7 @@ namespace Infrastructure.DriverAdapters.Rol
                 return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
             }
 
-            if (string.IsNullOrWhiteSpace(rolCreacionDTO.Tipo) || string.IsNullOrWhiteSpace(rolCreacionDTO.Nombre))
+            if (string.IsNullOrWhiteSpace(rolCreacionDTO.Tipe) || string.IsNullOrWhiteSpace(rolCreacionDTO.Name))
             {
                 return BadRequest(new { Message = "El Tipo y el Nombre del Rol son campos obligatorios." });
             }
@@ -64,7 +62,7 @@ namespace Infrastructure.DriverAdapters.Rol
             {
                 RolDTODriver CrearRol = await _rolPortCrear.CrearNuevoRol(rolCreacionDTO);
 
-                return Created($"/api/rolcreado/{CrearRol.Identificacion}", CrearRol);
+                return Created($"/api/rolcreado/{CrearRol.Identidad}", CrearRol);
             }
             catch (ArgumentException ex)
             {
@@ -108,21 +106,22 @@ namespace Infrastructure.DriverAdapters.Rol
         }
 
         [HttpPut]
-        public async Task<IActionResult> ModificarRol([FromBody] RolDTODriver rolModificarDTO)
+        public async Task<IActionResult> ModificarRol([FromBody] RolModificarRequestDTO rolModificarRequest)
         {
-            if (rolModificarDTO == null)
+            if (rolModificarRequest == null)
             {
                 return BadRequest(new { Message = "El cuerpo de la solicitud no puede estar vacío." });
             }
 
-            if (string.IsNullOrWhiteSpace(rolModificarDTO.Tipo) || string.IsNullOrWhiteSpace(rolModificarDTO.Nombre))
+            if (string.IsNullOrWhiteSpace(rolModificarRequest.NombreActual) || string.IsNullOrWhiteSpace(rolModificarRequest.TipoActual))
             {
-                return BadRequest(new { Message = "El Tipo y el Nombre del Rol son campos obligatorios para la modificación." });
+                return BadRequest(new { Message = "NombreActual y TipoActual son obligatorios para identificar el rol a modificar." });
             }
 
             try
             {
-                RolDTODriver rolModificado = await _rolPortModificar.ModificarRol(rolModificarDTO);
+                RolDTODriver rolModificado = await _rolPortModificar.ModificarRol(rolModificarRequest);
+
                 return Ok(rolModificado);
             }
             catch (ArgumentException ex)
@@ -131,6 +130,10 @@ namespace Infrastructure.DriverAdapters.Rol
             }
             catch (Exception ex)
             {
+                // Una buena práctica es verificar si la excepción es de un tipo específico (ej. "NotFoundException")
+                if (ex.Message.Contains("El rol no existe"))
+                    return NotFound(new { Message = ex.Message });
+
                 return StatusCode(500, new { Message = "Ocurrió un error interno al modificar el Rol.", Details = ex.Message });
             }
         }
