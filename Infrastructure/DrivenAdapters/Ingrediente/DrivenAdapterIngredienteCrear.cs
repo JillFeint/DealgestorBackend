@@ -16,11 +16,11 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
             _Context = Context;
         }
 
-        public async Task<bool> ExisteIngredienteNombre(string nombre, string tipo)
+        public async Task<bool> ExisteIngredienteNombre(int referencia, string nombre)
         {
-            return await _Context.tblRoles.AnyAsync(i => 
-                i.tblNombre.ToLower() == nombre.ToLower() && 
-                i.tblTipo.ToLower() == tipo.ToLower());
+            return await _Context.tblIngredientes.AnyAsync(i => 
+                i.tblReferencia == referencia && 
+                i.tblNombreIngrediente.ToLower() == nombre.ToLower());
         }
 
         public async Task<Domain.Entities.Ingrediente> CrearIngrediente(IngredienteDTODriver ingrediente)

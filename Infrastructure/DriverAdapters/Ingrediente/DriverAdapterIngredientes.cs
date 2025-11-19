@@ -46,7 +46,7 @@ namespace Infrastructure.DriverAdapters.Ingrediente
         }
 
         [HttpPost("crear")]
-        public async Task<IActionResult> CrearIngrediente([FromQuery] IngredienteDTODriver ingrediente)
+        public async Task<IActionResult> CrearIngrediente([FromBody] IngredienteDTODriver ingrediente)
         { 
          if (ingrediente == null)
             {

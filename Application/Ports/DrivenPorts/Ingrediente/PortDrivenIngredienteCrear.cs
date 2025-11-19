@@ -1,5 +1,4 @@
 ﻿using Application.DTOs.Ingredientes;
-using Application.DTOs.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace Application.Ports.DrivenPorts.Ingrediente
 {
     public interface PortDrivenIngredienteCrear
     {
-        Task<bool> ExisteIngredienteNombre(string nombre, string tipo);
+        Task<bool> ExisteIngredienteNombre(int referencia, string nombre);
         Task<Domain.Entities.Ingrediente> CrearIngrediente(IngredienteDTODriver);
     }
 }

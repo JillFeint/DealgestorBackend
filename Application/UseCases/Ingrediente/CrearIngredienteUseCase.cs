@@ -1,12 +1,11 @@
 ﻿using Application.DTOs.Ingredientes;
-using Application.DTOs.Roles;
-﻿using Application.Ports.DrivenPorts.Rol;
-﻿using Application.Ports.DriverPorts.Rol;
+﻿using Application.Ports.DrivenPorts.Ingrediente;
+﻿using Application.Ports.DriverPorts.Ingrediente;
 ﻿using Domain.Entities;
 ﻿using System;
 ﻿using System.Threading.Tasks;
 ﻿
-﻿namespace Application.UseCases.Rol
+﻿namespace Application.UseCases.Ingrediente
 ﻿{
 ﻿    public class CrearIngredienteUseCase : PortDriverIngredienteCrear
 ﻿    {
@@ -17,21 +16,22 @@ using Application.DTOs.Roles;
             _ingredientePersistencePort = ingredientePersistencePort;
 ﻿        }
 ﻿
-﻿        public async Task<IngredienteDTODriver> CrearNuevoRol(IngredienteDTODriver nuevoIngredienteDTO)
+﻿        public async Task<IngredienteDTODriver> CrearNuevoIngrediente(IngredienteDTODriver nuevoIngredienteDTO)
 ﻿        {
-﻿            bool rolExiste = await _rolPersistencePort.ExisteIngredienteNombre(nuevoRolDTO.Name, nuevoRolDTO.Tipe);
+﻿            bool rolExiste = await _ingredientePersistencePort.ExisteIngredienteNombre(nuevoIngredienteDTO.Referencia, nuevoIngredienteDTO.NombreIngrediente);
 ﻿            if (rolExiste)
 ﻿            {
-﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoRolDTO.Name}' ya existe en el sistema.");
+﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoIngredienteDTO.NombreIngrediente}' ya existe en el sistema.");
 ﻿            }
 
             Domain.Entities.Ingrediente ingredientePersistido = await _ingredientePersistencePort.CrearIngrediente(nuevoIngredienteDTO);
 ﻿
 ﻿            var ingredienteCreadoDTO = new IngredienteDTODriver
 ﻿            {
-﻿                Identidad = ingredientePersistido.IngredienteDTODriver,
-﻿                Tipe = ingredientePersistido.Tipo,
-﻿                Name = ingredientePersistido.Nombre
+﻿                Id = ingredientePersistido.Id,
+                Referencia = ingredientePersistido.Referencia,
+                NombreIngrediente = ingredientePersistido.NombreIngrediente,
+﻿                PrecioUnitario = ingredientePersistido.PrecioUnitario
 ﻿            };
 ﻿
 ﻿            return ingredienteCreadoDTO;

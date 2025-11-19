@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Ports.DriverPorts.Rol
 {
-    public interface PortDriverIngredienteCrear
+    public interface PortDriverRolCrear
     {
         Task<RolDTODriver> CrearNuevoRol(RolDTODriver nuevoRolDTO);
     }
