@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Roles;
+﻿using Application.DTOs.Ingredientes;
+using Application.DTOs.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Application.Ports.DriverPorts.Rol
 {
     public interface PortDriverIngredienteCrear
     {
-        Task<RolDTODriver> CrearNuevoRol(RolDTODriver nuevoRolDTO);
+        Task<IngredienteDTODriver> CrearIngrediente(IngredienteDTODriver nuevoIngredienteDTO);
     }
 }

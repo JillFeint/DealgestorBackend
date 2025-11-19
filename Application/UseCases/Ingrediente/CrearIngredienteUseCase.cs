@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Roles;
+﻿using Application.DTOs.Ingredientes;
+using Application.DTOs.Roles;
 ﻿using Application.Ports.DrivenPorts.Rol;
 ﻿using Application.Ports.DriverPorts.Rol;
 ﻿using Domain.Entities;
@@ -9,31 +10,31 @@
 ﻿{
 ﻿    public class CrearIngredienteUseCase : PortDriverIngredienteCrear
 ﻿    {
-﻿        private readonly PortDrivenIngredienteCrear _rolPersistencePort;
+﻿        private readonly PortDrivenIngredienteCrear _ingredientePersistencePort;
 ﻿
-﻿        public CrearIngredienteUseCase(PortDrivenIngredienteCrear rolPersistencePort)
+﻿        public CrearIngredienteUseCase(PortDrivenIngredienteCrear ingredientePersistencePort)
 ﻿        {
-﻿            _rolPersistencePort = rolPersistencePort;
+            _ingredientePersistencePort = ingredientePersistencePort;
 ﻿        }
 ﻿
-﻿        public async Task<RolDTODriver> CrearNuevoRol(RolDTODriver nuevoRolDTO)
+﻿        public async Task<IngredienteDTODriver> CrearNuevoRol(IngredienteDTODriver nuevoIngredienteDTO)
 ﻿        {
-﻿            bool rolExiste = await _rolPersistencePort.ExisteRolPorNombre(nuevoRolDTO.Name, nuevoRolDTO.Tipe);
+﻿            bool rolExiste = await _rolPersistencePort.ExisteIngredienteNombre(nuevoRolDTO.Name, nuevoRolDTO.Tipe);
 ﻿            if (rolExiste)
 ﻿            {
 ﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoRolDTO.Name}' ya existe en el sistema.");
 ﻿            }
 
-            Domain.Entities.Rol rolPersistido = await _rolPersistencePort.CrearRol(nuevoRolDTO);
+            Domain.Entities.Ingrediente ingredientePersistido = await _ingredientePersistencePort.CrearIngrediente(nuevoIngredienteDTO);
 ﻿
-﻿            var rolCreadoDTO = new RolDTODriver
+﻿            var ingredienteCreadoDTO = new IngredienteDTODriver
 ﻿            {
-﻿                Identidad = rolPersistido.Identificacion,
-﻿                Tipe = rolPersistido.Tipo,
-﻿                Name = rolPersistido.Nombre
+﻿                Identidad = ingredientePersistido.IngredienteDTODriver,
+﻿                Tipe = ingredientePersistido.Tipo,
+﻿                Name = ingredientePersistido.Nombre
 ﻿            };
 ﻿
-﻿            return rolCreadoDTO;
+﻿            return ingredienteCreadoDTO;
 ﻿        }
 ﻿    }
 ﻿}

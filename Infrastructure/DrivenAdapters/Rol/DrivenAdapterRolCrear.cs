@@ -1,5 +1,6 @@
 using Application.DTOs.Roles;
 using Application.Ports.DrivenPorts.Rol;
+using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterRolCrear : PortDrivenIngredienteCrear
+    public class DrivenAdapterIngredienteCrear : PortDrivenIngredienteCrear
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DrivenAdapterRolCrear(ApplicationDbContext dbContext)
+        public DrivenAdapterIngredienteCrear(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -25,7 +26,8 @@ namespace Infrastructure.DrivenAdapters.Rol
 
         public async Task<Domain.Entities.Rol> CrearRol(RolDTODriver rol)
         {
-            rol.Identidad = Guid.NewGuid();
+            if (rol.Identidad == Guid.Empty)
+                rol.Identidad = Guid.NewGuid();
 
             var nuevoRol = new RolDTODriven(
                 tblIdentificacion: rol.Identidad,
