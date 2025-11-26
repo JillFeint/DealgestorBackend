@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Application.Ports.DriverPorts.Rol
 {
-    public interface PortDriverIngredienteModificar
+    public interface PortDriverRolModificar
     {
         Task<RolDTODriver> ModificarRol(RolModificarRequestDTO rolModificarDTO);
     }

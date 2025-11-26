@@ -18,20 +18,22 @@
 ﻿
 ﻿        public async Task<IngredienteDTODriver> CrearNuevoIngrediente(IngredienteDTODriver nuevoIngredienteDTO)
 ﻿        {
-﻿            bool rolExiste = await _ingredientePersistencePort.ExisteIngredienteNombre(nuevoIngredienteDTO.Referencia, nuevoIngredienteDTO.NombreIngrediente);
-﻿            if (rolExiste)
+﻿            bool ingredienteExiste = await _ingredientePersistencePort.ExisteIngredienteNombre(nuevoIngredienteDTO.Ref, nuevoIngredienteDTO.NameIngredient);
+﻿            if (ingredienteExiste)
 ﻿            {
-﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoIngredienteDTO.NombreIngrediente}' ya existe en el sistema.");
+﻿                throw new ArgumentException($"El Rol con el nombre '{nuevoIngredienteDTO.NameIngredient}' ya existe en el sistema.");
 ﻿            }
 
             Domain.Entities.Ingrediente ingredientePersistido = await _ingredientePersistencePort.CrearIngrediente(nuevoIngredienteDTO);
 ﻿
 ﻿            var ingredienteCreadoDTO = new IngredienteDTODriver
 ﻿            {
-﻿                Id = ingredientePersistido.Id,
-                Referencia = ingredientePersistido.Referencia,
-                NombreIngrediente = ingredientePersistido.NombreIngrediente,
-﻿                PrecioUnitario = ingredientePersistido.PrecioUnitario
+﻿                Identidad = ingredientePersistido.Id,
+                Ref = ingredientePersistido.Referencia,
+                NameIngredient = ingredientePersistido.NombreIngrediente,
+                Quantity = ingredientePersistido.Cantidad,
+                PrecioPack = ingredientePersistido.PrecioPaquete,
+                PrecioUnidad = ingredientePersistido.PrecioUnitario
 ﻿            };
 ﻿
 ﻿            return ingredienteCreadoDTO;

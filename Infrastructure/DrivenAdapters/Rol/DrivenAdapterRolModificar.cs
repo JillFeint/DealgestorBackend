@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterRolModificar : PortDrivenIngredienteModificar
+    public class DrivenAdapterRolModificar : PortDrivenRolModificar
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -16,7 +16,7 @@ namespace Infrastructure.DrivenAdapters.Rol
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
        
-        public async Task<Domain.Entities.Rol> ObtenerRolPorNombreTipo(string name, string tipe)
+        public async Task<Domain.Entities.Rol> ObtenerRolNombreTipo(string name, string tipe)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(tipe))
                 return null;

@@ -1,48 +1,49 @@
-using Application.DTOs.Roles;
-using Application.Ports.DrivenPorts.Rol;
-using Application.Ports.DriverPorts.Rol;
+using Application.DTOs.Ingredientes;
+using Application.Ports.DrivenPorts.Ingrediente;
+using Application.Ports.DriverPorts.Ingrediente;
 using System;
 using System.Threading.Tasks;
 
-namespace Application.UseCases.Rol
+namespace Application.UseCases.Ingrediente
 {
     public class ModificarIngredienteUseCase : PortDriverIngredienteModificar
     {
-        private readonly PortDrivenIngredienteModificar _drivenRolModificar;
+        private readonly PortDrivenIngredienteModificar _drivenIngredienteModificar;
 
-        public ModificarIngredienteUseCase(PortDrivenIngredienteModificar drivenRolModificar)
+        public ModificarIngredienteUseCase(PortDrivenIngredienteModificar drivenIngredienteModificar)
         {
-            _drivenRolModificar = drivenRolModificar ?? throw new ArgumentNullException(nameof(drivenRolModificar));
+            _drivenIngredienteModificar = drivenIngredienteModificar ?? throw new ArgumentNullException(nameof(drivenIngredienteModificar));
         }
 
-        public async Task<RolDTODriver> ModificarRol(RolModificarRequestDTO rolModificarDTO)
+        public async Task<IngredienteDTODriver> ModificarIngrediente(IngredienteDTODriver ingredienteXModificar)
         {
-            var rolAModificar = await _drivenRolModificar.ObtenerRolPorNombreTipo(rolModificarDTO.NombreActual, rolModificarDTO.TipoActual);
+            var ingredienteAModificar = await _drivenIngredienteModificar.ObtenerNombreIngredienteRefe(ingredienteXModificar);
 
-            if (rolAModificar == null)
+            if (ingredienteAModificar == null)
             {
-                throw new Exception("El rol no existe.");
+                throw new Exception("El ingrediente no existe.");
             }
 
-            // 2. Aplicar los cambios a la entidad de dominio.
-            // Usamos ?? para mantener el valor original si el nuevo valor es nulo o vacío.
-            rolAModificar.Nombre = !string.IsNullOrWhiteSpace(rolModificarDTO.NuevoNombre) ? rolModificarDTO.NuevoNombre : rolAModificar.Nombre;
-            rolAModificar.Tipo = !string.IsNullOrWhiteSpace(rolModificarDTO.NuevoTipo) ? rolModificarDTO.NuevoTipo : rolAModificar.Tipo;
-
-            // 3. Llamar al puerto driven para persistir la entidad modificada.
-            var modificadoRol = await _drivenRolModificar.ModificarRol(rolAModificar);
-
-            if (modificadoRol == null)
+            if (ingredienteAModificar == false)
             {
-                throw new Exception("Error al modificar el rol en el repositorio.");
+                throw new Exception("El nombre o la referencia del no existe");
             }
 
-            // 4. Mapear la entidad de dominio actualizada de nuevo a un DTO para la respuesta.
-            var resultaDTO = new RolDTODriver
+            var modificadoIngrediente = await _drivenIngredienteModificar.ModificarIngrediente(ingredienteXModificar);
+
+            if (modificadoIngrediente == null)
             {
-                Identidad = modificadoRol.Identificacion,
-                Tipe = modificadoRol.Tipo,
-                Name = modificadoRol.Nombre
+                throw new Exception("Error al modificar el ingrediente en el repositorio.");
+            }
+
+            var resultaDTO = new IngredienteDTODriver    
+            {
+                Identidad = modificadoIngrediente.Id,
+                Ref = modificadoIngrediente.Referencia,
+                NameIngredient = modificadoIngrediente.NombreIngrediente,
+                Quantity = modificadoIngrediente.Cantidad,
+                PrecioPack = modificadoIngrediente.PrecioPaquete,
+                PrecioUnidad = modificadoIngrediente.PrecioUnitario
             };
 
             return resultaDTO;

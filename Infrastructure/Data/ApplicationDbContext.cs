@@ -31,6 +31,8 @@ namespace Infrastructure.Data
                 entity.HasKey(e => e.tblId);
                 entity.Property(e => e.tblReferencia).HasColumnName("tblReferencia");
                 entity.Property(e => e.tblNombreIngrediente).HasColumnName("tblNombreIngrediente").IsRequired();
+                entity.Property(e => e.tblCantidad).HasColumnName("tblCantidad").IsRequired();
+                entity.Property(e => e.tblPrecioPaquete).HasColumnName("tblPrecioPaquete").IsRequired();
                 entity.Property(e => e.tblPrecioUnitario).HasColumnName("tblPrecioUnitario").IsRequired();
             });
         }

@@ -10,6 +10,6 @@ namespace Application.Ports.DrivenPorts.Ingrediente
     public interface PortDrivenIngredienteCrear
     {
         Task<bool> ExisteIngredienteNombre(int referencia, string nombre);
-        Task<Domain.Entities.Ingrediente> CrearIngrediente(IngredienteDTODriver);
+        Task<Domain.Entities.Ingrediente> CrearIngrediente(IngredienteDTODriver nombreIngrediente);
     }
 }

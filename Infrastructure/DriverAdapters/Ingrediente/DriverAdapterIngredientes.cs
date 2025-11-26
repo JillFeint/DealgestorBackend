@@ -1,6 +1,5 @@
 using Application.DTOs.Ingredientes;
 using Application.Ports.DriverPorts.Ingrediente;
-using Application.Ports.DriverPorts.Rol;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -13,11 +12,15 @@ namespace Infrastructure.DriverAdapters.Ingrediente
     {
         private readonly PortDriverIngredienteConsultar _ingredientePortConsultar;
         private readonly PortDriverIngredienteCrear _ingredientePortCrear;
+        private readonly PortDriverIngredienteEliminar _ingredientePortEliminar;
+        private readonly PortDriverIngredienteModificar _ingredientePortModificar;
 
-        public DriverAdapterIngredientes(PortDriverIngredienteConsultar ingredientePortConsultar, PortDriverIngredienteCrear ingredientePortCrear)
+        public DriverAdapterIngredientes(PortDriverIngredienteConsultar ingredientePortConsultar, PortDriverIngredienteCrear ingredientePortCrear, PortDriverIngredienteEliminar ingredientePortEliminar, PortDriverIngredienteModificar ingredientePortModificar)
         {
             _ingredientePortConsultar = ingredientePortConsultar ?? throw new ArgumentNullException(nameof(ingredientePortConsultar));
-            _ingredientePortCrear = ingredientePortCrear ?? throw new ArgumentNullException(nameof(ingredientePortCrear)); 
+            _ingredientePortCrear = ingredientePortCrear ?? throw new ArgumentNullException(nameof(ingredientePortCrear));
+            _ingredientePortEliminar = ingredientePortEliminar ?? throw new ArgumentNullException(nameof(ingredientePortEliminar));
+            _ingredientePortModificar = ingredientePortModificar ?? throw new ArgumentNullException(nameof(ingredientePortModificar));
         }
 
         [HttpGet("consultar")]
@@ -54,12 +57,67 @@ namespace Infrastructure.DriverAdapters.Ingrediente
             }
             try
             {
-                IngredienteDTODriver ingredienteCreado = await _ingredientePortCrear.CrearIngrediente(ingrediente);
+                IngredienteDTODriver ingredienteCreado = await _ingredientePortCrear.CrearNuevoIngrediente(ingrediente);
                 return Ok(ingredienteCreado);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Ocurrió un error interno al crear el ingrediente.", Details = ex.Message });
+            }
+        }
+
+        [HttpDelete("{referencia}")]
+        public async Task<IActionResult> EliminarIngrediente([FromRoute] int referencia)
+        {
+            if (referencia <= 0)
+            {
+                return BadRequest(new { Message = "La referencia del ingrediente es inválida." });
+            }
+
+            try
+            {
+                bool ingredienteEliminado = await _ingredientePortEliminar.EliminarIngrediente(referencia);
+
+                if (ingredienteEliminado)
+                {
+
+                    return Ok(new { Message = "Ha sido eliminado exitosamente." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Sin proceso" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Ocurrió un error interno al eliminar el ingrediente.", Details = ex.Message });
+            }
+        }
+
+        [HttpPut("{referencia}")]
+        public async Task<IActionResult> ModificarIngrediente([FromBody] IngredienteDTODriver ingredienteXModificar)
+        {
+            if (ingredienteXModificar == null)
+            {
+                return BadRequest(new { Message = "El cuerpo de la solicitud no puede ser null." });
+            }
+
+            try
+            {
+                IngredienteDTODriver ingredienteModificado = await _ingredientePortModificar.ModificarIngrediente(ingredienteXModificar);
+
+                return Ok(ingredienteModificado);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {       
+                if (ex.Message.Contains("El rol no existe"))
+                    return NotFound(new { Message = ex.Message });
+
+                return StatusCode(500, new { Message = "Ocurrió un error interno al modificar el Rol.", Details = ex.Message });
             }
         }
     }

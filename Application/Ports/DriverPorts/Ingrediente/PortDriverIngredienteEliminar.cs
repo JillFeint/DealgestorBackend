@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Ports.DriverPorts.Rol
+namespace Application.Ports.DriverPorts.Ingrediente
 {
     public interface PortDriverIngredienteEliminar
     {
-        Task<bool> EliminarRol(string nombre);
+        Task<bool> EliminarIngrediente(int ingrediente);
     }
 }

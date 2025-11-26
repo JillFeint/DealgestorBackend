@@ -1,10 +1,10 @@
-using Application.DTOs.Roles;
+using Application.DTOs.Ingredientes;
 using System.Threading.Tasks;
 
-namespace Application.Ports.DriverPorts.Rol
+namespace Application.Ports.DriverPorts.Ingrediente
 {
     public interface PortDriverIngredienteModificar
     {
-        Task<RolDTODriver> ModificarRol(RolModificarRequestDTO rolModificarDTO);
+        Task<IngredienteDTODriver> ModificarIngrediente(IngredienteDTODriver ingredienteXModificar);
     }
 }

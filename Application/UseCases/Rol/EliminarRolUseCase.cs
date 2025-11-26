@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Application.UseCases.Rol
 {
-    public class EliminarIngredienteUseCase : PortDriverIngredienteEliminar
+    public class EliminarRolUseCase : PortDriverRolEliminar
     {
-        private readonly PortDrivenIngredienteEliminar _rolPortDrivenEliminar;
+        private readonly PortDrivenRolEliminar _rolPortDrivenEliminar;
 
-        public EliminarIngredienteUseCase(PortDrivenIngredienteEliminar rolPortEliminar)
+        public EliminarRolUseCase(PortDrivenRolEliminar rolPortEliminar)
         {
             _rolPortDrivenEliminar = rolPortEliminar;
         }

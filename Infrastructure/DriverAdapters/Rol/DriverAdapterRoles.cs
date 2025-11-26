@@ -12,11 +12,11 @@ namespace Infrastructure.DriverAdapters.Rol
     public class DriverAdapterRoles : ControllerBase
     {
         private readonly PortDriverRolConsultar _rolPort;
-        private readonly PortDriverIngredienteCrear _rolPortCrear;
-        private readonly PortDriverIngredienteEliminar _rolPortEliminar;
-        private readonly PortDriverIngredienteModificar _rolPortModificar;
+        private readonly PortDriverRolCrear _rolPortCrear;
+        private readonly PortDriverRolEliminar _rolPortEliminar;
+        private readonly PortDriverRolModificar _rolPortModificar;
 
-        public DriverAdapterRoles(PortDriverRolConsultar DriverRolPort, PortDriverIngredienteCrear rolPortCrear, PortDriverIngredienteEliminar rolPortEliminar, PortDriverIngredienteModificar rolPortModificar)
+        public DriverAdapterRoles(PortDriverRolConsultar DriverRolPort, PortDriverRolCrear rolPortCrear, PortDriverRolEliminar rolPortEliminar, PortDriverRolModificar rolPortModificar)
         {
             _rolPort = DriverRolPort;
             _rolPortCrear = rolPortCrear;

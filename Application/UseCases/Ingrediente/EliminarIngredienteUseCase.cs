@@ -1,27 +1,27 @@
-﻿using Application.Ports.DrivenPorts.Rol;
-using Application.Ports.DriverPorts.Rol;
+﻿using Application.Ports.DrivenPorts.Ingrediente;
+using Application.Ports.DriverPorts.Ingrediente;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.UseCases.Rol
+namespace Application.UseCases.Ingrediente
 {
     public class EliminarIngredienteUseCase : PortDriverIngredienteEliminar
     {
-        private readonly PortDrivenIngredienteEliminar _rolPortDrivenEliminar;
+        private readonly PortDrivenIngredienteEliminar _ingredientePortDrivenEliminar;
 
-        public EliminarIngredienteUseCase(PortDrivenIngredienteEliminar rolPortEliminar)
+        public EliminarIngredienteUseCase(PortDrivenIngredienteEliminar ingredientePortEliminar)
         {
-            _rolPortDrivenEliminar = rolPortEliminar;
+            _ingredientePortDrivenEliminar = ingredientePortEliminar;
         }
 
-        public async Task<bool> EliminarRol(string nombre)
+        public async Task<bool> EliminarIngrediente(int referencia)
         {
-            bool rolRespuestaEliminacion = await _rolPortDrivenEliminar.EliminarRol(nombre);
+            bool ingredienteRespuestaEliminacion = await _ingredientePortDrivenEliminar.EliminarIngrediente(referencia);
 
-            return rolRespuestaEliminacion;
+            return ingredienteRespuestaEliminacion;
         }
     }
 }

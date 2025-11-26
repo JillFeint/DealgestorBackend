@@ -17,7 +17,7 @@ namespace Application.UseCases.Ingrediente
 
         public async Task<IngredienteDTODriver> ConsultarIngredienteNombre(string nombre)
         {
-            var ingredienteEntidad = await _portDrivenIngredientes.ObtenerPorNombre(nombre);
+            var ingredienteEntidad = await _portDrivenIngredientes.ObtenerNombre(nombre);
 
             if (ingredienteEntidad == null)
             {
@@ -26,10 +26,12 @@ namespace Application.UseCases.Ingrediente
 
             var ingredienteDTO = new IngredienteDTODriver
             {
-                Id = ingredienteEntidad.Id,
-                Referencia = ingredienteEntidad.Referencia,
-                NombreIngrediente = ingredienteEntidad.NombreIngrediente,
-                PrecioUnitario = ingredienteEntidad.PrecioUnitario
+                Identidad = ingredienteEntidad.Id,
+                Ref = ingredienteEntidad.Referencia,
+                NameIngredient = ingredienteEntidad.NombreIngrediente,
+                Quantity = ingredienteEntidad.Cantidad,
+                PrecioPack = ingredienteEntidad.PrecioPaquete,
+                PrecioUnidad = ingredienteEntidad.PrecioUnitario
             };
 
             return ingredienteDTO;

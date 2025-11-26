@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterIngredienteCrear : PortDrivenIngredienteCrear
+    public class DrivenAdapterRolCrear : PortDrivenRolCrear
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DrivenAdapterIngredienteCrear(ApplicationDbContext dbContext)
+        public DrivenAdapterRolCrear(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

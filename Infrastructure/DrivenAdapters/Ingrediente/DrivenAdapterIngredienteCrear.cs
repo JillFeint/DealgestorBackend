@@ -25,14 +25,16 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
 
         public async Task<Domain.Entities.Ingrediente> CrearIngrediente(IngredienteDTODriver ingrediente)
         {
-            if (ingrediente.Id == Guid.Empty)
-                ingrediente.Id = Guid.NewGuid();
+            if (ingrediente.Identidad == Guid.Empty)
+                ingrediente.Identidad = Guid.NewGuid();
 
                 var nuevoIngrediente = new IngredienteDTODriven(
-                tblId: ingrediente.Id,
-                tblReferencia: ingrediente.Referencia,
-                tblNombreIngrediente: ingrediente.NombreIngrediente,
-                tblPrecioUnitario: ingrediente.PrecioUnitario
+                tblId: ingrediente.Identidad,
+                tblReferencia: ingrediente.Ref,
+                tblNombreIngrediente: ingrediente.NameIngredient,
+                tblCantidad : ingrediente.Quantity,
+                tblPrecioPaquete: ingrediente.PrecioPack,
+                tblPrecioUnitario: ingrediente.PrecioUnidad
             );
 
             _Context.tblIngredientes.Add(nuevoIngrediente);
@@ -43,6 +45,8 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
                 Id = nuevoIngrediente.tblId,
                 Referencia = nuevoIngrediente.tblReferencia,
                 NombreIngrediente = nuevoIngrediente.tblNombreIngrediente,
+                Cantidad = nuevoIngrediente.tblCantidad,
+                PrecioPaquete = nuevoIngrediente.tblPrecioPaquete,
                 PrecioUnitario = nuevoIngrediente.tblPrecioUnitario
             };
         }

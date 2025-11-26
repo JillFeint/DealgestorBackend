@@ -5,9 +5,11 @@ namespace Application.DTOs.Ingredientes
     // Debe ser 'public' para ser accesible desde la capa de Infrastructure (el controlador)
     public class IngredienteDTODriver
     {
-        public Guid Id { get; set; }
-        public int Referencia { get; set; }
-        public string NombreIngrediente { get; set; }
-        public decimal PrecioUnitario { get; set; }
+        public Guid Identidad { get; set; }
+        public int Ref { get; set; }
+        public string NameIngredient { get; set; }
+        public int Quantity { get; set; }
+        public decimal PrecioPack { get; set; }
+        public decimal PrecioUnidad { get; set; }
     }
 }

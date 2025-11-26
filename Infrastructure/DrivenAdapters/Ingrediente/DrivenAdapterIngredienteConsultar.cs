@@ -32,6 +32,8 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
                 Id = tblIngrediente.tblId,
                 Referencia = tblIngrediente.tblReferencia,
                 NombreIngrediente = tblIngrediente.tblNombreIngrediente,
+                Cantidad = tblIngrediente.tblCantidad,
+                PrecioPaquete = tblIngrediente.tblPrecioPaquete,
                 PrecioUnitario = tblIngrediente.tblPrecioUnitario  
             };
         }

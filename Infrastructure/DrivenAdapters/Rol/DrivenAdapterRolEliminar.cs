@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Rol
 {
-    public class DrivenAdapterRolEliminar : PortDrivenIngredienteEliminar
+    public class DrivenAdapterRolEliminar : PortDrivenRolEliminar
     {
         private readonly ApplicationDbContext _dbContext;
 

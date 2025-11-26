@@ -12,7 +12,7 @@ namespace Domain.Entities
         public int Referencia { get; set; }
         public string NombreIngrediente { get; set; }
         public int Cantidad { get; set; }
-        public string PrecioPaquete { get; set; }
+        public decimal PrecioPaquete { get; set; }
         public decimal PrecioUnitario { get; set; }
     }
 }

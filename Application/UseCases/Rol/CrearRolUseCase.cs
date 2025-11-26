@@ -7,11 +7,11 @@
 ﻿
 ﻿namespace Application.UseCases.Rol
 ﻿{
-﻿    public class CrearIngredienteUseCase : PortDriverIngredienteCrear
+﻿    public class CrearRolUseCase : PortDriverRolCrear
 ﻿    {
-﻿        private readonly PortDrivenIngredienteCrear _rolPersistencePort;
+﻿        private readonly PortDrivenRolCrear _rolPersistencePort;
 ﻿
-﻿        public CrearIngredienteUseCase(PortDrivenIngredienteCrear rolPersistencePort)
+﻿        public CrearRolUseCase(PortDrivenRolCrear rolPersistencePort)
 ﻿        {
 ﻿            _rolPersistencePort = rolPersistencePort;
 ﻿        }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Ports.DrivenPorts.Rol
 {
-    public interface PortDrivenIngredienteCrear
+    public interface PortDrivenRolCrear
     {
         Task<bool> ExisteRolPorNombre(string nombre, string tipo);
         Task<Domain.Entities.Rol> CrearRol(RolDTODriver rol);
