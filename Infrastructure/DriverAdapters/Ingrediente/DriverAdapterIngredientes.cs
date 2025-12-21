@@ -30,7 +30,7 @@ namespace Infrastructure.DriverAdapters.Ingrediente
             _ingredientePortCrear = ingredientePortCrear ?? throw new ArgumentNullException(nameof(ingredientePortCrear));
             _ingredientePortEliminar = ingredientePortEliminar ?? throw new ArgumentNullException(nameof(ingredientePortEliminar));
             _ingredientePortModificar = ingredientePortModificar ?? throw new ArgumentNullException(nameof(ingredientePortModificar));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -164,8 +164,9 @@ namespace Infrastructure.DriverAdapters.Ingrediente
 
                 if (ingredienteEliminado)
                 {
+                    DateTime fechaEliminacion = DateTime.UtcNow;
                     _logger.LogInformation("Ingrediente eliminado exitosamente: Ref {Ref}", referencia);
-                    return Ok(new { Message = "El ingrediente ha sido eliminado exitosamente." });
+                    return Ok(new { Message = "El ingrediente ha sido eliminado exitosamente.", FechaEliminacion = fechaEliminacion });
                 }
                 else
                 {
@@ -195,7 +196,7 @@ namespace Infrastructure.DriverAdapters.Ingrediente
         /// </summary>
         /// <param name="ingredienteXModificar">Datos del ingrediente a modificar</param>
         /// <returns>El ingrediente modificado</returns>
-        [HttpPut("{referencia}")]
+        [HttpPut("modificar/{referencia}")]
         [ProducesResponseType(typeof(IngredienteDTODriver), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]

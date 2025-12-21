@@ -30,7 +30,7 @@ namespace Infrastructure.DriverAdapters.Perfil
             _consultarPerfilUseCase = consultarPerfilUseCase ?? throw new ArgumentNullException(nameof(consultarPerfilUseCase));
             _eliminarPerfilUseCase = eliminarPerfilUseCase ?? throw new ArgumentNullException(nameof(eliminarPerfilUseCase));
             _modificarPerfilUseCase = modificarPerfilUseCase ?? throw new ArgumentNullException(nameof(modificarPerfilUseCase));
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -259,4 +259,6 @@ namespace Infrastructure.DriverAdapters.Perfil
         }
     }
 }
+
+
 

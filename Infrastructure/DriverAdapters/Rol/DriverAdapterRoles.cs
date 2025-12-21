@@ -27,11 +27,11 @@ namespace Infrastructure.DriverAdapters.Rol
             PortDriverRolModificar rolPortModificar,
             ILogger<DriverAdapterRoles> logger)
         {
-            _rolPort = DriverRolPort;
-            _rolPortCrear = rolPortCrear;
-            _rolPortEliminar = rolPortEliminar;
-            _rolPortModificar = rolPortModificar;
-            _logger = logger;
+            _rolPort = DriverRolPort ?? throw new ArgumentNullException(nameof(DriverRolPort));
+            _rolPortCrear = rolPortCrear ?? throw new ArgumentNullException(nameof(rolPortCrear));
+            _rolPortEliminar = rolPortEliminar ?? throw new ArgumentNullException(nameof(rolPortEliminar));
+            _rolPortModificar = rolPortModificar ?? throw new ArgumentNullException(nameof(rolPortModificar));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Infrastructure.DriverAdapters.Rol
         /// </summary>
         /// <param name="rolCreacionDTO">Datos del rol a crear</param>
         /// <returns>El rol creado</returns>
-        [HttpPost]
+        [HttpPost("crear")] 
         [ProducesResponseType(typeof(RolDTODriver), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
@@ -110,7 +110,7 @@ namespace Infrastructure.DriverAdapters.Rol
                 
                 _logger.LogInformation("Rol creado exitosamente: {@RolCreado}", new { CrearRol.Identidad, CrearRol.Name });
 
-                return Created($"/api/rolcreado/{CrearRol.Identidad}", CrearRol);
+                return Created($"/api/roles/{CrearRol.Identidad}", CrearRol);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -140,7 +140,7 @@ namespace Infrastructure.DriverAdapters.Rol
         /// </summary>
         /// <param name="nombre">Nombre del rol a eliminar</param>
         /// <returns>Confirmación de eliminación</returns>
-        [HttpDelete("{nombre}")]
+        [HttpDelete("eliminar/{nombre}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
@@ -161,8 +161,9 @@ namespace Infrastructure.DriverAdapters.Rol
 
                 if (rolEliminado)
                 {
+                    DateTime fechaEliminacion = DateTime.UtcNow;
                     _logger.LogInformation("Rol eliminado exitosamente: {Nombre}", nombre);
-                    return Ok(new { Message = "El rol ha sido eliminado exitosamente." });
+                    return Ok(new { Message = "El rol ha sido eliminado exitosamente.", FechaEliminacion = fechaEliminacion });
                 }
                 else
                 {
@@ -192,7 +193,7 @@ namespace Infrastructure.DriverAdapters.Rol
         /// </summary>
         /// <param name="rolModificarRequest">Datos del rol a modificar</param>
         /// <returns>El rol modificado</returns>
-        [HttpPut]
+        [HttpPut("modificar")]
         [ProducesResponseType(typeof(RolDTODriver), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
