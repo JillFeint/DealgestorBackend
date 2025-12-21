@@ -8,12 +8,10 @@
 
 	<ItemGroup>
 		<Folder Include="DrivenAdapters\Negocio\" />
-		<Folder Include="DrivenAdapters\Perfil\" />
 		<Folder Include="DrivenAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Negocio\" />
 		<Folder Include="DriverAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Perfil\" />
-		<Folder Include="Tarjetas\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,6 +27,8 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.7.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.7.1" />
 	</ItemGroup>
 
 </Project>

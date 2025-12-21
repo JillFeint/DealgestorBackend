@@ -14,4 +14,13 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Ports\DrivenPorts\Negocio\" />
+	  <Folder Include="UseCases\Negocio\" />
+	</ItemGroup>
+
 </Project>

@@ -12,7 +12,7 @@ namespace Domain.Entities
         public string Email { get; set; }
         public string CodigoSecreto { get; set; }
         public List<Negocio> Negocios { get; set; }
-        public Rol PermisosRol { get; set; }
-
+        public List<Rol> PermisosRol { get; set; }
+        public DateTime FechaCreacion { get; set; }
     }
 }
