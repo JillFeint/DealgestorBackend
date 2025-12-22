@@ -1,9 +1,6 @@
 ﻿using Application.Ports.DrivenPorts.Ingrediente;
 using Application.Ports.DriverPorts.Ingrediente;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.UseCases.Ingrediente
@@ -19,9 +16,17 @@ namespace Application.UseCases.Ingrediente
 
         public async Task<bool> EliminarIngrediente(int referencia)
         {
-            bool ingredienteRespuestaEliminacion = await _ingredientePortDrivenEliminar.EliminarIngrediente(referencia);
+            if (referencia <= 0)
+                throw new ArgumentException("La referencia debe ser un número positivo.", nameof(referencia));
 
-            return ingredienteRespuestaEliminacion;
+            bool eliminado = await _ingredientePortDrivenEliminar.EliminarIngrediente(referencia);
+
+            if (!eliminado)
+            {
+                throw new ArgumentException("No se encontró ningún ingrediente con la referencia especificada.", nameof(referencia));
+            }
+
+            return eliminado;
         }
     }
 }

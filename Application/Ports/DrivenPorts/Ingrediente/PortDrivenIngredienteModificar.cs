@@ -9,11 +9,16 @@ namespace Application.Ports.DrivenPorts.Ingrediente
     public interface PortDrivenIngredienteModificar
     {
         /// <summary>
-        /// Obtiene el nombre del ingrediente por su referencia.
+        /// Obtiene un ingrediente por su referencia.
         /// </summary>
-        /// <param name="ingredienteXModificar">Los datos del ingrediente a modificar.</param>
-        /// <returns>True si se encontró el ingrediente, false en caso contrario.</returns>
-        Task<bool> ObtenerNombreIngredienteRefe(IngredienteDTODriver ingredienteXModificar);
+        /// <param name="referencia">Referencia del ingrediente.</param>
+        /// <returns>El ingrediente encontrado o null si no existe.</returns>
+        Task<Domain.Entities.Ingrediente?> ObtenerPorReferencia(int referencia);
+
+        /// <summary>
+        /// Verifica si existe otro ingrediente con la misma referencia o nombre (case-insensitive), excluyendo el Id actual.
+        /// </summary>
+        Task<bool> ExisteDuplicado(int referencia, string nombre, System.Guid excluirId);
         
         /// <summary>
         /// Modifica un ingrediente existente en la base de datos.

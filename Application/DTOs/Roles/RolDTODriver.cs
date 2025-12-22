@@ -18,7 +18,7 @@ namespace Application.DTOs.Roles
         /// </summary>
         [Required(ErrorMessage = "El tipo de rol es obligatorio.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El tipo debe tener entre 3 y 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El tipo solo puede contener letras, números y espacios.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$", ErrorMessage = "El tipo solo puede contener letras, números y espacios.")]
         public string Tipe { get; set; } = string.Empty;
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Application.DTOs.Roles
         /// </summary>
         [Required(ErrorMessage = "El nombre del rol es obligatorio.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 100 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El nombre solo puede contener letras, números y espacios.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$", ErrorMessage = "El nombre solo puede contener letras, números y espacios.")]
         public string Name { get; set; } = string.Empty;
 
         public RolDTODriver() { }

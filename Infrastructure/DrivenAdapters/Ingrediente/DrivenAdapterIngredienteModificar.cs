@@ -21,54 +21,58 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-       
-        /// <summary>
-        /// Verifica si un ingrediente existe y tiene todos los campos válidos
-        /// </summary>
-        /// <param name="ingredienteXModificar">DTO del ingrediente a verificar</param>
-        /// <returns>True si existe y es válido, False en caso contrario</returns>
-        public async Task<bool> ObtenerNombreIngredienteRefe(IngredienteDTODriver ingredienteXModificar)
+
+        public async Task<Domain.Entities.Ingrediente?> ObtenerPorReferencia(int referencia)
         {
             try
             {
-                _logger.LogInformation("Verificando ingrediente: Ref {Ref}", ingredienteXModificar?.Ref);
+                _logger.LogInformation("Obteniendo ingrediente por referencia: {Ref}", referencia);
 
-                if (ingredienteXModificar == null)
+                var ing = await _dbContext.tblIngredientes.FirstOrDefaultAsync(r => r.tblReferencia == referencia);
+
+                if (ing == null)
                 {
-                    _logger.LogWarning("Ingrediente nulo para verificación");
-                    return false;
+                    _logger.LogWarning("Ingrediente no encontrado: Ref {Ref}", referencia);
+                    return null;
                 }
 
-                var ingVal = await _dbContext.tblIngredientes
-                    .FirstOrDefaultAsync(r => r.tblReferencia == ingredienteXModificar.Ref);
-
-                if (ingVal == null)
+                return new Domain.Entities.Ingrediente
                 {
-                    _logger.LogWarning("Ingrediente no encontrado: Ref {Ref}", ingredienteXModificar.Ref);
-                    return false;
-                }
-
-                var esValido =
-                    !string.IsNullOrWhiteSpace(ingVal.tblNombreIngrediente) &&
-                    ingVal.tblReferencia != null &&
-                    ingVal.tblCantidad != null &&
-                    ingVal.tblPrecioPaquete != null &&
-                    ingVal.tblPrecioUnitario != null;
-
-                if (!esValido)
-                {
-                    _logger.LogWarning("Ingrediente inválido o incompleto: Ref {Ref}", ingredienteXModificar.Ref);
-                }
-                else
-                {
-                    _logger.LogInformation("Ingrediente válido: Ref {Ref}", ingredienteXModificar.Ref);
-                }
-
-                return esValido;
+                    Id = ing.tblId,
+                    Referencia = ing.tblReferencia,
+                    NombreIngrediente = ing.tblNombreIngrediente,
+                    Cantidad = ing.tblCantidad,
+                    PrecioPaquete = ing.tblPrecioPaquete,
+                    PrecioUnitario = ing.tblPrecioUnitario
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al verificar ingrediente: Ref {Ref}", ingredienteXModificar?.Ref);
+                _logger.LogError(ex, "Error al obtener ingrediente: Ref {Ref}", referencia);
+                throw;
+            }
+        }
+
+        public async Task<bool> ExisteDuplicado(int referencia, string nombre, Guid excluirId)
+        {
+            try
+            {
+                _logger.LogInformation("Verificando duplicado de ingrediente: Ref {Ref}, Nombre {Nombre}", referencia, nombre);
+
+                var existe = await _dbContext.tblIngredientes.AnyAsync(i =>
+                    i.tblId != excluirId &&
+                    (i.tblReferencia == referencia || i.tblNombreIngrediente.ToLower() == nombre.ToLower()));
+
+                if (existe)
+                {
+                    _logger.LogWarning("Ingrediente duplicado detectado: Ref {Ref}, Nombre {Nombre}", referencia, nombre);
+                }
+
+                return existe;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al verificar duplicado de ingrediente: Ref {Ref}, Nombre {Nombre}", referencia, nombre);
                 throw;
             }
         }
@@ -82,12 +86,11 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
         {
             try
             {
-                _logger.LogInformation("Modificando ingrediente: {@Ingrediente}", 
-                    new { ingredienteModificador.Ref, ingredienteModificador.NameIngredient });
+                _logger.LogInformation("Modificando ingrediente: {@Ingrediente}", new { ingredienteModificador.Ref, ingredienteModificador.NameIngredient });
 
                 ArgumentNullException.ThrowIfNull(ingredienteModificador);
 
-                var ingredienteEnDb = await _dbContext.tblIngredientes.FindAsync(ingredienteModificador.Ref);
+                var ingredienteEnDb = await _dbContext.tblIngredientes.FirstOrDefaultAsync(i => i.tblReferencia == ingredienteModificador.Ref);
 
                 if (ingredienteEnDb == null)
                 {
@@ -95,7 +98,6 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
                     return null;
                 }
 
-                ingredienteEnDb.tblReferencia = ingredienteModificador.Ref;
                 ingredienteEnDb.tblNombreIngrediente = ingredienteModificador.NameIngredient;
                 ingredienteEnDb.tblCantidad = ingredienteModificador.Quantity;
                 ingredienteEnDb.tblPrecioPaquete = ingredienteModificador.PrecioPack;
@@ -104,8 +106,7 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
                 _dbContext.tblIngredientes.Update(ingredienteEnDb);
                 await _dbContext.SaveChangesAsync();
 
-                _logger.LogInformation("Ingrediente modificado exitosamente: {@IngredienteModificado}", 
-                    new { ingredienteEnDb.tblReferencia, ingredienteEnDb.tblNombreIngrediente });
+                _logger.LogInformation("Ingrediente modificado exitosamente: {@IngredienteModificado}", new { ingredienteEnDb.tblReferencia, ingredienteEnDb.tblNombreIngrediente });
 
                 return new Domain.Entities.Ingrediente
                 {
@@ -119,8 +120,7 @@ namespace Infrastructure.DrivenAdapters.Ingrediente
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al modificar ingrediente: {@Ingrediente}", 
-                    new { ingredienteModificador.Ref, ingredienteModificador.NameIngredient });
+                _logger.LogError(ex, "Error al modificar ingrediente: {@Ingrediente}", new { ingredienteModificador.Ref, ingredienteModificador.NameIngredient });
                 throw;
             }
         }

@@ -58,8 +58,11 @@ namespace Application.UseCases.Perfil
             if (string.IsNullOrWhiteSpace(perfil.CodigoSecreto))
                 throw new ArgumentException("La contraseña no puede estar vacía.", nameof(perfil.CodigoSecreto));
 
-            if (perfil.CodigoSecreto.Length < 7)                    
-                throw new ArgumentException("La contraseña debe tener al menos 6 caracteres.", nameof(perfil.CodigoSecreto));
+            if (perfil.CodigoSecreto.Length < 8)
+                throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.", nameof(perfil.CodigoSecreto));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(perfil.CodigoSecreto, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"))
+                throw new ArgumentException("La contraseña debe contener al menos una mayúscula, una minúscula y un número.", nameof(perfil.CodigoSecreto));
         }
 
         private bool EsEmailValido(string email)

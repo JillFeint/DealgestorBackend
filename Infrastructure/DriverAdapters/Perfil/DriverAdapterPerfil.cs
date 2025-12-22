@@ -3,6 +3,7 @@ using Application.Ports.DriverPorts.Perfil;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace Infrastructure.DriverAdapters.Perfil
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("default")]
     public class DriverAdapterPerfil : ControllerBase
     {
         private readonly PortDriverPerfilCrear _crearPerfilUseCase;
@@ -45,7 +47,7 @@ namespace Infrastructure.DriverAdapters.Perfil
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ConsultarPerfil([FromQuery] string email, string codeEspecial)
+        public async Task<IActionResult> ConsultarPerfil([FromQuery] string email, [FromHeader(Name = "X-Code-Especial")] string codeEspecial)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -152,7 +154,7 @@ namespace Infrastructure.DriverAdapters.Perfil
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EliminarPerfil([FromRoute] string email, [FromQuery] string codeEspecial)
+        public async Task<IActionResult> EliminarPerfil([FromRoute] string email, [FromHeader(Name = "X-Code-Especial")] string codeEspecial)
         {
             if (string.IsNullOrWhiteSpace(email))
             {

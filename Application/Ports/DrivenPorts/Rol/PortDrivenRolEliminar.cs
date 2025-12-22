@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Ports.DrivenPorts.Rol
@@ -12,7 +9,17 @@ namespace Application.Ports.DrivenPorts.Rol
     public interface PortDrivenRolEliminar
     {
         /// <summary>
-        /// Elimina un rol de la base de datos por su nombre.
+        /// Obtiene un rol por su nombre (comparación normalizada).
+        /// </summary>
+        Task<Domain.Entities.Rol?> ObtenerRolPorNombre(string nombreNormalizado);
+
+        /// <summary>
+        /// Indica si el rol está en uso por algún perfil.
+        /// </summary>
+        Task<bool> EstaRolEnUso(Guid rolId);
+
+        /// <summary>
+        /// Elimina un rol de la base de datos por su nombre normalizado.
         /// </summary>
         /// <param name="nombre">El nombre del rol a eliminar.</param>
         /// <returns>True si se eliminó correctamente, false en caso contrario.</returns>

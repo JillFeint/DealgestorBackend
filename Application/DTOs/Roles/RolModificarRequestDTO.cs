@@ -26,14 +26,14 @@ namespace Application.DTOs.Roles
         /// Nuevo nombre para el rol (opcional, solo si se desea cambiar)
         /// </summary>
         [StringLength(100, MinimumLength = 3, ErrorMessage = "El nuevo nombre debe tener entre 3 y 100 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El nuevo nombre solo puede contener letras, números y espacios.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$", ErrorMessage = "El nuevo nombre solo puede contener letras, números y espacios.")]
         public string? NuevoNombre { get; set; }
 
         /// <summary>
         /// Nuevo tipo para el rol (opcional, solo si se desea cambiar)
         /// </summary>
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El nuevo tipo debe tener entre 3 y 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "El nuevo tipo solo puede contener letras, números y espacios.")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$", ErrorMessage = "El nuevo tipo solo puede contener letras, números y espacios.")]
         public string? NuevoTipo { get; set; }
     }
 }

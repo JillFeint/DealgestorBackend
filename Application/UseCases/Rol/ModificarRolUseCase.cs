@@ -17,15 +17,37 @@ namespace Application.UseCases.Rol
 
         public async Task<RolDTODriver> ModificarRol(RolModificarRequestDTO rolModificarDTO)
         {
-            var rolAModificar = await _drivenRolModificar.ObtenerRolNombreTipo(rolModificarDTO.NombreActual, rolModificarDTO.TipoActual);
+            if (rolModificarDTO == null) throw new ArgumentNullException(nameof(rolModificarDTO));
+
+            string nombreActualCmp = Normalizar(rolModificarDTO.NombreActual);
+            string tipoActualCmp = Normalizar(rolModificarDTO.TipoActual);
+
+            var rolAModificar = await _drivenRolModificar.ObtenerRolNombreTipo(nombreActualCmp, tipoActualCmp);
 
             if (rolAModificar == null)
             {
-                throw new Exception("El rol no existe.");
+                throw new ArgumentException("El rol no existe.");
             }
 
-            rolAModificar.Nombre = !string.IsNullOrWhiteSpace(rolModificarDTO.NuevoNombre) ? rolModificarDTO.NuevoNombre : rolAModificar.Nombre;
-            rolAModificar.Tipo = !string.IsNullOrWhiteSpace(rolModificarDTO.NuevoTipo) ? rolModificarDTO.NuevoTipo : rolAModificar.Tipo;
+            string nuevoNombre = string.IsNullOrWhiteSpace(rolModificarDTO.NuevoNombre)
+                ? rolAModificar.Nombre
+                : rolModificarDTO.NuevoNombre.Trim();
+
+            string nuevoTipo = string.IsNullOrWhiteSpace(rolModificarDTO.NuevoTipo)
+                ? rolAModificar.Tipo
+                : rolModificarDTO.NuevoTipo.Trim();
+
+            string nuevoNombreCmp = Normalizar(nuevoNombre);
+            string nuevoTipoCmp = Normalizar(nuevoTipo);
+
+            var rolDuplicado = await _drivenRolModificar.ObtenerRolNombreTipo(nuevoNombreCmp, nuevoTipoCmp);
+            if (rolDuplicado != null && rolDuplicado.Identificacion != rolAModificar.Identificacion)
+            {
+                throw new ArgumentException($"El rol '{nuevoNombre}' ya existe.");
+            }
+
+            rolAModificar.Nombre = nuevoNombre;
+            rolAModificar.Tipo = nuevoTipo;
 
             var modificadoRol = await _drivenRolModificar.ModificarRol(rolAModificar);
 
@@ -43,5 +65,7 @@ namespace Application.UseCases.Rol
 
             return resultaDTO;
         }
+
+        private string Normalizar(string value) => value.Trim().ToUpperInvariant();
     }
 }

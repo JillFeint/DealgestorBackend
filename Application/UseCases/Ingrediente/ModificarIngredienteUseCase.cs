@@ -17,26 +17,41 @@ namespace Application.UseCases.Ingrediente
 
         public async Task<IngredienteDTODriver> ModificarIngrediente(IngredienteDTODriver ingredienteXModificar)
         {
-            var ingredienteAModificar = await _drivenIngredienteModificar.ObtenerNombreIngredienteRefe(ingredienteXModificar);
+            ValidarEntrada(ingredienteXModificar);
 
-            if (ingredienteAModificar == null)
+            var ingredienteActual = await _drivenIngredienteModificar.ObtenerPorReferencia(ingredienteXModificar.Ref);
+
+            if (ingredienteActual == null)
             {
-                throw new Exception("El ingrediente no existe.");
+                throw new ArgumentException("El ingrediente no existe.");
             }
 
-            if (ingredienteAModificar == false)
+            bool duplicado = await _drivenIngredienteModificar.ExisteDuplicado(
+                ingredienteXModificar.Ref,
+                ingredienteXModificar.NameIngredient.Trim(),
+                ingredienteActual.Id);
+
+            if (duplicado)
             {
-                throw new Exception("El nombre o la referencia del no existe");
+                throw new ArgumentException($"El ingrediente con referencia '{ingredienteXModificar.Ref}' o nombre '{ingredienteXModificar.NameIngredient}' ya existe.");
             }
 
-            var modificadoIngrediente = await _drivenIngredienteModificar.ModificarIngrediente(ingredienteXModificar);
+            var modificadoIngrediente = await _drivenIngredienteModificar.ModificarIngrediente(new IngredienteDTODriver
+            {
+                Identidad = ingredienteActual.Id,
+                Ref = ingredienteXModificar.Ref,
+                NameIngredient = ingredienteXModificar.NameIngredient.Trim(),
+                Quantity = ingredienteXModificar.Quantity,
+                PrecioPack = ingredienteXModificar.PrecioPack,
+                PrecioUnidad = ingredienteXModificar.PrecioUnidad
+            });
 
             if (modificadoIngrediente == null)
             {
                 throw new Exception("Error al modificar el ingrediente en el repositorio.");
             }
 
-            var resultaDTO = new IngredienteDTODriver    
+            var resultaDTO = new IngredienteDTODriver
             {
                 Identidad = modificadoIngrediente.Id,
                 Ref = modificadoIngrediente.Referencia,
@@ -47,6 +62,16 @@ namespace Application.UseCases.Ingrediente
             };
 
             return resultaDTO;
+        }
+
+        private void ValidarEntrada(IngredienteDTODriver dto)
+        {
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+            if (string.IsNullOrWhiteSpace(dto.NameIngredient)) throw new ArgumentException("El nombre del ingrediente es obligatorio.", nameof(dto.NameIngredient));
+            if (dto.Ref <= 0) throw new ArgumentException("La referencia debe ser un número positivo.", nameof(dto.Ref));
+            if (dto.Quantity < 0) throw new ArgumentException("La cantidad no puede ser negativa.", nameof(dto.Quantity));
+            if (dto.PrecioPack < 0) throw new ArgumentException("El precio del paquete no puede ser negativo.", nameof(dto.PrecioPack));
+            if (dto.PrecioUnidad < 0) throw new ArgumentException("El precio unitario no puede ser negativo.", nameof(dto.PrecioUnidad));
         }
     }
 }

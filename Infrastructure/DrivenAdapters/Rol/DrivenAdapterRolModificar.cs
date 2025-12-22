@@ -41,7 +41,7 @@ namespace Infrastructure.DrivenAdapters.Rol
                 }
 
                 var rolEncontrado = await _dbContext.tblRoles
-                    .FirstOrDefaultAsync(r => r.tblNombre == name && r.tblTipo == tipe);
+                    .FirstOrDefaultAsync(r => r.tblNombre.ToLower() == name.ToLower() && r.tblTipo.ToLower() == tipe.ToLower());
 
                 if (rolEncontrado == null)
                 {

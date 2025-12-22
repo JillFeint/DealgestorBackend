@@ -171,6 +171,11 @@ namespace Infrastructure.DriverAdapters.Rol
                     return NotFound(new { Message = $"No se encontró un rol con el nombre '{nombre}'." });
                 }
             }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "No se puede eliminar rol en uso: {Nombre}", nombre);
+                return Conflict(new { Message = ex.Message });
+            }
             catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning(ex, "Acceso no autorizado al eliminar rol: {Nombre}", nombre);
