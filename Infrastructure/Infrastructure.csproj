@@ -8,9 +8,7 @@
 
 	<ItemGroup>
 		<Folder Include="DrivenAdapters\Negocio\" />
-		<Folder Include="DrivenAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Negocio\" />
-		<Folder Include="DriverAdapters\Producto\" />
 		<Folder Include="DriverAdapters\Perfil\" />
 	</ItemGroup>
 

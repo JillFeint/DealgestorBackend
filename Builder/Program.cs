@@ -1,18 +1,19 @@
 using Application.Ports.DrivenPorts.Ingrediente;
-//using Application.Ports.DrivenPorts.Negocio;
 using Application.Ports.DrivenPorts.Perfil;
+using Application.Ports.DrivenPorts.Producto;
 using Application.Ports.DrivenPorts.Rol;
 using Application.Ports.DriverPorts.Ingrediente;
 using Application.Ports.DriverPorts.Perfil;
+using Application.Ports.DriverPorts.Producto;
 using Application.Ports.DriverPorts.Rol;
 using Application.UseCases.Ingrediente;
-//using Application.UseCases.Negocio;
 using Application.UseCases.Perfil;
+using Application.UseCases.Producto;
 using Application.UseCases.Rol;
 using Infrastructure.Data;
 using Infrastructure.DrivenAdapters.Ingrediente;
-//using Infrastructure.DrivenAdapters.Negocio;
 using Infrastructure.DrivenAdapters.Perfil;
+using Infrastructure.DrivenAdapters.Producto;
 using Infrastructure.DrivenAdapters.Rol;
 using Infrastructure.DriverAdapters.Ingrediente;
 using Infrastructure.DriverAdapters.Rol;
@@ -74,13 +75,13 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.Configure<ConfiguracionDeTarjeta>(
 builder.Configuration.GetSection(ConfiguracionDeTarjeta.NombreSeccion));
 builder.Services.AddSingleton<PortTarjetaGenerador, EmisorDeTarjetas>();
+builder.Services.AddSingleton<Application.Ports.DrivenPorts.Tarjeta.IGeneradorDeTokens, EmisorDeTarjetas>();
 
 // 2. Configuración del JWT Bearer para la validación
 var configTarjeta = builder.Configuration
     .GetSection(ConfiguracionDeTarjeta.NombreSeccion)
     .Get<ConfiguracionDeTarjeta>();
 
-// Validar que la configuración JWT exista y sea válida
 if (configTarjeta == null)
 {
     throw new InvalidOperationException($"La sección de configuración '{ConfiguracionDeTarjeta.NombreSeccion}' no está presente en appsettings.json");
@@ -137,10 +138,10 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Cross-cutting opcional
-// builder.Services.AddHttpClient<IDrivenNegocioRepository, DrivenAdapterNegocio>();
-// builder.Services.AddHealthChecks()
-//     .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!);
+//// Cross-cutting opcional
+//// builder.Services.AddHttpClient<IDrivenNegocioRepository, DrivenAdapterNegocio>();
+//builder.Services.AddHealthChecks()
+//    .AddDbContextCheck<ApplicationDbContext>("db");
 
 // Driver Ports (Use Cases) - Transient
 builder.Services.AddTransient<PortDriverRolConsultar, ConsultarRolUseCase>();
@@ -155,6 +156,11 @@ builder.Services.AddTransient<PortDriverPerfilCrear, CrearPerfilUseCase>();
 builder.Services.AddTransient<PortDriverPerfilConsultar, ConsultarPerfilUseCase>();
 builder.Services.AddTransient<PortDriverPerfilEliminar, EliminarPerfilUseCase>();
 builder.Services.AddTransient<PortDriverPerfilModificar, ModificarPerfilUseCase>();
+builder.Services.AddTransient<PortDriverPerfilAutenticar, AutenticarPerfilUseCase>();
+builder.Services.AddTransient<PortDriverProductoConsultar, ConsultarProductoUseCase>();
+builder.Services.AddTransient<PortDriverProductoCrear, CrearProductoUseCase>();
+builder.Services.AddTransient<PortDriverProductoEliminar, EliminarProductoUseCase>();
+builder.Services.AddTransient<PortDriverProductoModificar, ModificarProductoUseCase>();
 
 // Driven Ports (Repositories) - Scoped
 builder.Services.AddScoped<PortDrivenRolConsultar, DrivenAdapterRolConsultar>();
@@ -169,15 +175,15 @@ builder.Services.AddScoped<PortDrivenPerfilCrear, DrivenAdapterPerfilCrear>();
 builder.Services.AddScoped<PortDrivenPerfilConsultar, DrivenAdapterPerfilConsultar>();
 builder.Services.AddScoped<PortDrivenPerfilEliminar, DrivenAdapterPerfilEliminar>();
 builder.Services.AddScoped<PortDrivenPerfilModificar, DrivenAdapterPerfilModificar>();
+builder.Services.AddScoped<PortDrivenProductoConsultar, DrivenAdapterProductoConsultar>();
+builder.Services.AddScoped<PortDrivenProductoCrear, DrivenAdapterProductoCrear>();
+builder.Services.AddScoped<PortDrivenProductoEliminar, DrivenAdapterProductoEliminar>();
+builder.Services.AddScoped<PortDrivenProductoModificar, DrivenAdapterProductoModificar>();
 
-builder.Services.AddAuthorization(); // Permite el uso de [Authorize]
-
-// ... el resto de tus servicios (Controladores, UseCases, Repositorios)
-builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Migraciones automáticas (controlar por configuración)
 if (app.Configuration.GetValue<bool>("ApplyMigrationsOnStart"))
 {
     using var scope = app.Services.CreateScope();
@@ -198,7 +204,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dealgestor API V1");
+        c.RoutePrefix = string.Empty;
+    });
 }
 
 // Orden correcto del middleware pipeline
@@ -207,7 +217,7 @@ app.UseRateLimiter();
 app.UseAuthentication(); // Identifica al usuario (Lee la tarjeta)
 app.UseAuthorization();  // Autoriza al usuario (Revisa los permisos/roles)
 
-app.MapHealthChecks("/health");
+//app.MapHealthChecks("/health");
 app.MapControllers();
 app.Run();
 

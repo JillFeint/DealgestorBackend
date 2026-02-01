@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DrivenAdapters.Perfil
@@ -22,10 +23,10 @@ namespace Infrastructure.DrivenAdapters.Perfil
         }
 
         /// <summary>
-        /// Consulta un perfil por email en la base de datos
+        /// Consulta un perfil por email en la base de datos y carga sus roles asociados
         /// </summary>
         /// <param name="email">Email del perfil a consultar</param>
-        /// <returns>El perfil encontrado o null si no existe</returns>
+        /// <returns>El perfil encontrado con sus roles o null si no existe</returns>
         public async Task<Domain.Entities.Perfil> ConsultarPerfilPorEmailAsync(string email)
         {
             try
@@ -41,13 +42,27 @@ namespace Infrastructure.DrivenAdapters.Perfil
                     return null;
                 }
 
-                _logger.LogInformation("Perfil encontrado exitosamente: {Email}", email);
+                // Cargar los roles asociados al perfil
+                var rolesDelPerfil = await _dbContext.tblRoles
+                    .Where(rol => tblPerfil.tblPermisosRolIds.Contains(rol.tblIdentificacion))
+                    .Select(rol => new Domain.Entities.Rol
+                    {
+                        Identificacion = rol.tblIdentificacion,
+                        Nombre = rol.tblNombre,
+                        Tipo = rol.tblTipo
+                    })
+                    .ToListAsync();
+
+                _logger.LogInformation("Perfil encontrado exitosamente: {Email} con {CantidadRoles} roles", 
+                    email, rolesDelPerfil.Count);
+
                 return new Domain.Entities.Perfil
                 {
                     Identidad = tblPerfil.tblIdentidad,
                     Email = tblPerfil.tblEmail,
                     CodigoSecreto = tblPerfil.tblCodigoSecreto,
-                    FechaCreacion = tblPerfil.tblFechaCreacion
+                    FechaCreacion = tblPerfil.tblFechaCreacion,
+                    PermisosRol = rolesDelPerfil
                 };
             }
             catch (Exception ex)

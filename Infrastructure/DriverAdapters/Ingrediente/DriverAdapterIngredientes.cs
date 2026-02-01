@@ -1,8 +1,10 @@
 using Application.DTOs.Ingredientes;
 using Application.Ports.DriverPorts.Ingrediente;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +13,8 @@ namespace Infrastructure.DriverAdapters.Ingrediente
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("default")]
+    [Authorize] // Requiere autenticación para todo el controller
     public class DriverAdapterIngredientes : ControllerBase
     {
         private readonly PortDriverIngredienteConsultar _ingredientePortConsultar;
@@ -20,9 +24,9 @@ namespace Infrastructure.DriverAdapters.Ingrediente
         private readonly ILogger<DriverAdapterIngredientes> _logger;
 
         public DriverAdapterIngredientes(
-            PortDriverIngredienteConsultar ingredientePortConsultar, 
-            PortDriverIngredienteCrear ingredientePortCrear, 
-            PortDriverIngredienteEliminar ingredientePortEliminar, 
+            PortDriverIngredienteConsultar ingredientePortConsultar,
+            PortDriverIngredienteCrear ingredientePortCrear,
+            PortDriverIngredienteEliminar ingredientePortEliminar,
             PortDriverIngredienteModificar ingredientePortModificar,
             ILogger<DriverAdapterIngredientes> logger)
         {
@@ -34,61 +38,19 @@ namespace Infrastructure.DriverAdapters.Ingrediente
         }
 
         /// <summary>
-        /// Consulta un ingrediente por su nombre
+        /// Crea un nuevo ingrediente en el sistema.
+        /// Requiere rol Admin o Vendedor.
         /// </summary>
-        /// <param name="nombre">Nombre del ingrediente a consultar</param>
-        /// <returns>El ingrediente consultado</returns>
-        [HttpGet("consultar")]
-        [ProducesResponseType(typeof(IngredienteDTODriver), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ConsultarIngredientePorNombre([FromQuery] string nombre)
-        {
-            if (string.IsNullOrWhiteSpace(nombre))
-            {
-                _logger.LogWarning("Intento de consultar ingrediente con nombre vacío");
-                return BadRequest(new { Message = "El nombre del ingrediente es inválido." });
-            }
-
-            try
-            {
-                IngredienteDTODriver ingredienteExistente = await _ingredientePortConsultar.ConsultarIngredienteNombre(nombre);
-
-                if (ingredienteExistente == null)
-                {
-                    _logger.LogWarning("Ingrediente no encontrado: {Nombre}", nombre);
-                    return NotFound(new { Message = $"No se encontró un ingrediente con el nombre '{nombre}'." });
-                }
-
-                return Ok(ingredienteExistente);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning(ex, "Acceso no autorizado al consultar ingrediente: {Nombre}", nombre);
-                return Unauthorized(new { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al consultar ingrediente: {Nombre}", nombre);
-                return StatusCode(500, new { Message = "Ocurrió un error interno al consultar el ingrediente.", Details = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Crea un nuevo ingrediente en el sistema
-        /// </summary>
-        /// <param name="ingrediente">Datos del ingrediente a crear</param>
-        /// <returns>El ingrediente creado</returns>
-        [HttpPost("crear")]
+        [HttpPost]
+        [Authorize(Roles = "Admin,Vendedor")] // Admin O Vendedor pueden crear
         [ProducesResponseType(typeof(IngredienteDTODriver), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CrearIngrediente([FromBody] IngredienteDTODriver ingrediente)
-        { 
+        public async Task<IActionResult> CrearIngrediente([FromBody] IngredienteDTODriver nuevoIngrediente)
+        {
             // Validación automática usando Data Annotations
             if (!ModelState.IsValid)
             {
@@ -104,9 +66,9 @@ namespace Infrastructure.DriverAdapters.Ingrediente
             try
             {
                 _logger.LogInformation("Creando ingrediente: {@Ingrediente}", 
-                    new { ingrediente.NameIngredient, ingrediente.Ref });
+                    new { nuevoIngrediente.NameIngredient, nuevoIngrediente.Ref });
                 
-                IngredienteDTODriver ingredienteCreado = await _ingredientePortCrear.CrearNuevoIngrediente(ingrediente);
+                IngredienteDTODriver ingredienteCreado = await _ingredientePortCrear.CrearNuevoIngrediente(nuevoIngrediente);
                 
                 _logger.LogInformation("Ingrediente creado exitosamente: {@IngredienteCreado}", 
                     new { ingredienteCreado.Ref, ingredienteCreado.NameIngredient });
@@ -115,50 +77,118 @@ namespace Infrastructure.DriverAdapters.Ingrediente
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogWarning(ex, "Acceso no autorizado al crear ingrediente: {Nombre}", ingrediente.NameIngredient);
+                _logger.LogWarning(ex, "Acceso no autorizado al crear ingrediente: {Nombre}", nuevoIngrediente.NameIngredient);
                 return Unauthorized(new { Message = ex.Message });
             }
             catch (ArgumentException ex)
             {
                 if (ex.Message.Contains("ya existe"))
                 {
-                    _logger.LogWarning("Intento de crear ingrediente duplicado: {Nombre}", ingrediente.NameIngredient);
+                    _logger.LogWarning("Intento de crear ingrediente duplicado: {Nombre}", nuevoIngrediente.NameIngredient);
                     return Conflict(new { Message = ex.Message });
                 }
                 
-                _logger.LogWarning(ex, "Error de validación al crear ingrediente: {Nombre}", ingrediente.NameIngredient);
+                _logger.LogWarning(ex, "Error de validación al crear ingrediente: {Nombre}", nuevoIngrediente.NameIngredient);
                 return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error crítico al crear ingrediente: {@Ingrediente}", 
-                    new { ingrediente.NameIngredient, ingrediente.Ref });
+                    new { nuevoIngrediente.NameIngredient, nuevoIngrediente.Ref });
                 return StatusCode(500, new { Message = "Ocurrió un error interno al crear el ingrediente.", Details = ex.Message });
             }
         }
 
         /// <summary>
-        /// Elimina un ingrediente por su referencia
+        /// Modifica un ingrediente existente en el sistema.
+        /// Requiere rol Admin o Vendedor.
         /// </summary>
-        /// <param name="referencia">Referencia del ingrediente a eliminar</param>
-        /// <returns>Confirmación de eliminación</returns>
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Vendedor")] // Admin O Vendedor pueden modificar
+        [ProducesResponseType(typeof(IngredienteDTODriver), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ModificarIngrediente(Guid id, [FromBody] IngredienteDTODriver ingredienteModificado)
+        {
+            // Validación automática usando Data Annotations
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validación de modelo fallida al modificar ingrediente. Errores: {@Errores}", 
+                    ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return BadRequest(new 
+                { 
+                    Message = "Los datos proporcionados no son válidos.",
+                    Errores = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+
+            try
+            {
+                _logger.LogInformation("Modificando ingrediente: {@IngredienteActual}", 
+                    new { ingredienteModificado.Ref, ingredienteModificado.NameIngredient });
+                
+                IngredienteDTODriver ingredienteModificadoRespuesta = await _ingredientePortModificar.ModificarIngrediente(ingredienteModificado);
+                
+                _logger.LogInformation("Ingrediente modificado exitosamente: {@IngredienteModificado}", 
+                    new { ingredienteModificadoRespuesta.Ref, ingredienteModificadoRespuesta.NameIngredient });
+
+                return Ok(ingredienteModificadoRespuesta);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Acceso no autorizado al modificar ingrediente: Ref {Ref}", ingredienteModificado.Ref);
+                return Unauthorized(new { Message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                if (ex.Message.Contains("ya existe"))
+                {
+                    _logger.LogWarning("Intento de modificar ingrediente a nombre duplicado: Ref {Ref}", ingredienteModificado.Ref);
+                    return Conflict(new { Message = ex.Message });
+                }
+                
+                _logger.LogWarning(ex, "Error de validación al modificar ingrediente: Ref {Ref}", ingredienteModificado.Ref);
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {       
+                if (ex.Message.Contains("no existe"))
+                {
+                    _logger.LogWarning("Intento de modificar ingrediente inexistente: Ref {Ref}", ingredienteModificado.Ref);
+                    return NotFound(new { Message = ex.Message });
+                }
+
+                _logger.LogError(ex, "Error crítico al modificar ingrediente: Ref {Ref}", ingredienteModificado.Ref);
+                return StatusCode(500, new { Message = "Ocurrió un error interno al modificar el ingrediente.", Details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Elimina un ingrediente del sistema por su referencia.
+        /// Requiere rol Admin (acción crítica).
+        /// </summary>
         [HttpDelete("{referencia}")]
+        [Authorize(Roles = "Admin")] // Solo Admin puede eliminar
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EliminarIngrediente([FromRoute] int referencia)
+        public async Task<IActionResult> EliminarIngrediente(int referencia)
         {
             if (referencia <= 0)
             {
-                _logger.LogWarning("Intento de eliminar ingrediente con referencia inválida: {Ref}", referencia);
+                _logger.LogWarning("Intento de eliminar ingrediente con referencia inválida");
                 return BadRequest(new { Message = "La referencia del ingrediente es inválida." });
             }
 
             try
             {
-                _logger.LogInformation("Eliminando ingrediente con Ref: {Ref}", referencia);
+                _logger.LogInformation("Eliminando ingrediente con referencia: {Ref}", referencia);
                 
                 bool ingredienteEliminado = await _ingredientePortEliminar.EliminarIngrediente(referencia);
 
@@ -188,73 +218,6 @@ namespace Infrastructure.DriverAdapters.Ingrediente
             {
                 _logger.LogError(ex, "Error crítico al eliminar ingrediente: Ref {Ref}", referencia);
                 return StatusCode(500, new { Message = "Ocurrió un error interno al eliminar el ingrediente.", Details = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Modifica un ingrediente existente
-        /// </summary>
-        /// <param name="ingredienteXModificar">Datos del ingrediente a modificar</param>
-        /// <returns>El ingrediente modificado</returns>
-        [HttpPut("modificar/{referencia}")]
-        [ProducesResponseType(typeof(IngredienteDTODriver), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
-        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ModificarIngrediente([FromBody] IngredienteDTODriver ingredienteXModificar)
-        {
-            // Validación automática usando Data Annotations
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Validación de modelo fallida al modificar ingrediente. Errores: {@Errores}", 
-                    ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                return BadRequest(new 
-                { 
-                    Message = "Los datos proporcionados no son válidos.",
-                    Errores = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
-            }
-
-            try
-            {
-                _logger.LogInformation("Modificando ingrediente: {@IngredienteActual}", 
-                    new { ingredienteXModificar.Ref, ingredienteXModificar.NameIngredient });
-                
-                IngredienteDTODriver ingredienteModificado = await _ingredientePortModificar.ModificarIngrediente(ingredienteXModificar);
-                
-                _logger.LogInformation("Ingrediente modificado exitosamente: {@IngredienteModificado}", 
-                    new { ingredienteModificado.Ref, ingredienteModificado.NameIngredient });
-
-                return Ok(ingredienteModificado);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning(ex, "Acceso no autorizado al modificar ingrediente: Ref {Ref}", ingredienteXModificar.Ref);
-                return Unauthorized(new { Message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                if (ex.Message.Contains("ya existe"))
-                {
-                    _logger.LogWarning("Intento de modificar ingrediente a nombre duplicado: Ref {Ref}", ingredienteXModificar.Ref);
-                    return Conflict(new { Message = ex.Message });
-                }
-                
-                _logger.LogWarning(ex, "Error de validación al modificar ingrediente: Ref {Ref}", ingredienteXModificar.Ref);
-                return BadRequest(new { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {       
-                if (ex.Message.Contains("no existe"))
-                {
-                    _logger.LogWarning("Intento de modificar ingrediente inexistente: Ref {Ref}", ingredienteXModificar.Ref);
-                    return NotFound(new { Message = ex.Message });
-                }
-
-                _logger.LogError(ex, "Error crítico al modificar ingrediente: Ref {Ref}", ingredienteXModificar.Ref);
-                return StatusCode(500, new { Message = "Ocurrió un error interno al modificar el ingrediente.", Details = ex.Message });
             }
         }
     }

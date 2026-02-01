@@ -1,9 +1,10 @@
 ﻿using Application.DTOs.Roles;
 using Application.Ports.DriverPorts.Rol;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Domain.Entities;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,22 +13,24 @@ namespace Infrastructure.DriverAdapters.Rol
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("default")]
+    [Authorize(Roles = "Admin")] // Solo Admin puede gestionar roles
     public class DriverAdapterRoles : ControllerBase
     {
-        private readonly PortDriverRolConsultar _rolPort;
+        private readonly PortDriverRolConsultar _rolPortConsultar;
         private readonly PortDriverRolCrear _rolPortCrear;
         private readonly PortDriverRolEliminar _rolPortEliminar;
         private readonly PortDriverRolModificar _rolPortModificar;
         private readonly ILogger<DriverAdapterRoles> _logger;
 
         public DriverAdapterRoles(
-            PortDriverRolConsultar DriverRolPort, 
+            PortDriverRolConsultar rolPortConsultar, 
             PortDriverRolCrear rolPortCrear, 
             PortDriverRolEliminar rolPortEliminar, 
             PortDriverRolModificar rolPortModificar,
             ILogger<DriverAdapterRoles> logger)
         {
-            _rolPort = DriverRolPort ?? throw new ArgumentNullException(nameof(DriverRolPort));
+            _rolPortConsultar = rolPortConsultar ?? throw new ArgumentNullException(nameof(rolPortConsultar));
             _rolPortCrear = rolPortCrear ?? throw new ArgumentNullException(nameof(rolPortCrear));
             _rolPortEliminar = rolPortEliminar ?? throw new ArgumentNullException(nameof(rolPortEliminar));
             _rolPortModificar = rolPortModificar ?? throw new ArgumentNullException(nameof(rolPortModificar));
@@ -55,7 +58,7 @@ namespace Infrastructure.DriverAdapters.Rol
 
             try
             {
-                RolDTODriver rolesExistente = await _rolPort.ConsultarIdentificadoresRol(nombre);
+                RolDTODriver rolesExistente = await _rolPortConsultar.ConsultarIdentificadoresRol(nombre);
 
                 if (rolesExistente == null)
                 {

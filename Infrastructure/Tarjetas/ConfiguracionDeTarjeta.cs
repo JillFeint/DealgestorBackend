@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Infrastructure.Tarjetas
 {
     public class ConfiguracionDeTarjeta
-    {
-        public const string NombreSeccion = "Jwt";
+    {       
+        public const string NombreSeccion = "ConfiguracionDeTarjeta";
         public string Secret { get; init; } = null!;
         public string Issuer { get; init; } = null!;
         public string Audience { get; init; } = null!;
