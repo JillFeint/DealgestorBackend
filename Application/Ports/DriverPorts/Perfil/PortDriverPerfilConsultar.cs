@@ -14,6 +14,6 @@ namespace Application.Ports.DriverPorts.Perfil
         /// <param name="email">El email del perfil a buscar.</param>
         /// <param name="codeEspecial">El código especial para la consulta.</param>
         /// <returns>El DTO de respuesta del perfil encontrado.</returns>
-        Task<PerfilRespuestaDTODriver> ConsultarPerfilPorEmail(string email, string codeEspecial);
+        Task<PerfilRespuestaDTODriver> ConsultarPerfilPorEmail(string email);
     }
 }

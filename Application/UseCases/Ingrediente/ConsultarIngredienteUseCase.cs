@@ -17,14 +17,14 @@ namespace Application.UseCases.Ingrediente
 
         public async Task<IngredienteDTODriver> ConsultarIngredienteNombre(string nombre)
         {
-            var ingredienteEntidad = await _portDrivenIngredientes.ObtenerNombre(nombre);
+            Domain.Entities.Ingrediente ingredienteEntidad = await _portDrivenIngredientes.ObtenerNombre(nombre);
 
             if (ingredienteEntidad == null)
             {
                 return null;
             }
 
-            var ingredienteDTO = new IngredienteDTODriver
+            IngredienteDTODriver ingredienteDTO = new IngredienteDTODriver
             {
                 Identidad = ingredienteEntidad.Id,
                 Ref = ingredienteEntidad.Referencia,
