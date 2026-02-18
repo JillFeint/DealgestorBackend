@@ -1,0 +1,18 @@
+{
+    "ApplyMigrationsOnStart": true,
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Port=5432;Database=dealgestor_db;Username=dealgestor_user;Password=SU_PASSWORD_SEGURO"
+    },
+    "Jwt": {
+        "Issuer": "DealgestorBackend",
+        "Audience": "DealgestorBackendClients",
+        "Secret": "CambiaEsteSecretoPorUnoLargoYSeguro_AlMenos32Chars"
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*"
+}
